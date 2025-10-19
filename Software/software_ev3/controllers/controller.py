@@ -1,5 +1,9 @@
-from hardware import BalanceMotor, DistanceSensor, PowerTrain, RobotHub, SlopeSensor
-from pybricks.tools import wait, StopWatch
+from ..hardware.balance_motor import BalanceMotor
+from ..hardware.distance_sensor import DistanceSensor
+from ..hardware.power_train import PowerTrain
+from ..hardware.robot_hub import RobotHub
+from ..hardware.slope_sensor import SlopeSensor
+from pybricks.tools import StopWatch
 
 
 class Controller:
@@ -15,7 +19,7 @@ class Controller:
         cls._instance = instance
         return instance
 
-    def __init__(self, hardware):
+    def __init__(self):
         self.hub = RobotHub()
         self.power_train = PowerTrain()
         self.balance_motor = BalanceMotor()
@@ -26,25 +30,26 @@ class Controller:
         # TODO make this an enum that switches state, not a bool for every state!
         self.running = False
 
-def run(self):
-    """Main control loop with delta timing using Pybricks StopWatch."""
 
-    self.running = True
-    sw = StopWatch()          # starts at 0 ms
-    last_ms = sw.time()       # initial timestamp
+    def run(self):
+        """Main control loop with delta timing using Pybricks StopWatch."""
 
-    try:
-        while self.running:
-            now_ms = sw.time()
-            dt = (now_ms - last_ms) / 1000.0  # convert to seconds
-            last_ms = now_ms
+        self.running = True
+        sw = StopWatch()          # starts at 0 ms
+        last_ms = sw.time()       # initial timestamp
 
-            # expose dt for update(); keep signature of update() unchanged
-            self.time_delta = dt
+        try:
+            while self.running:
+                now_ms = sw.time()
+                dt = (now_ms - last_ms) / 1000.0  # convert to seconds
+                last_ms = now_ms
 
-            self.update()
-    except KeyboardInterrupt:
-        self.stop()
+                # expose dt for update(); keep signature of update() unchanged
+                self.time_delta = dt
+
+                self.update()
+        except KeyboardInterrupt:
+            self.stop()
 
     def update(self):
         """Periodic update logic."""
