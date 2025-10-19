@@ -4,11 +4,12 @@ from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
 from pybricks.parameters import Port, Stop, Direction, Button, Color
 from pybricks.tools import wait, StopWatch, DataLog
 from pybricks.robotics import DriveBase
-from pybricks.media.ev3dev import SoundFile, Image
+from pybricks.media.ev3dev import SoundFile, ImageFile
 
-left_motor = Motor(Port.A)
-right_motor = Motor(Port.D)
-balance_motor = Motor(Port.C)
+# Create your objects here.
+ev3 = EV3Brick()
 
 color_sensor = ColorSensor(Port.S1)
-distance_sensor = UltrasonicSensor(Port.S2)
+
+for i in range (1_000_000):
+    print(color_sensor.reflection())
