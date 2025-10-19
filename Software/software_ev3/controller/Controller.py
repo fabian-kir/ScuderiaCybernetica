@@ -1,5 +1,5 @@
 from hardware import BalanceMotor, DistanceSensor, PowerTrain, RobotHub, SlopeSensor
-from pybricks.tools import wait
+from pybricks.tools import wait, StopWatch
 
 
 class Controller:
@@ -26,16 +26,25 @@ class Controller:
         # TODO make this an enum that switches state, not a bool for every state!
         self.running = False
 
-    def run(self):
-        """Main control loop."""
-        self.running = True
-        # TODO: Add startup checks or calibration
-        try:
-            while self.running:
-                self.update()
-                #wait(100) # why wait? we gotta run at full speed! -> Better: use timing modules
-        except KeyboardInterrupt:
-            self.stop()
+def run(self):
+    """Main control loop with delta timing using Pybricks StopWatch."""
+
+    self.running = True
+    sw = StopWatch()          # starts at 0 ms
+    last_ms = sw.time()       # initial timestamp
+
+    try:
+        while self.running:
+            now_ms = sw.time()
+            dt = (now_ms - last_ms) / 1000.0  # convert to seconds
+            last_ms = now_ms
+
+            # expose dt for update(); keep signature of update() unchanged
+            self.time_delta = dt
+
+            self.update()
+    except KeyboardInterrupt:
+        self.stop()
 
     def update(self):
         """Periodic update logic."""
