@@ -1,5 +1,5 @@
 from core.hardware_setup import init_hardware
-from core.controller import Controller
+from core import Controller
 
 def main():
     # Initialize all hardware
