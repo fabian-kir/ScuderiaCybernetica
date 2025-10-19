@@ -1,4 +1,4 @@
-from pybricks.parameters import UltrasonicSensor
+from pybricks.ev3devices import UltrasonicSensor
 
 class DistanceSensor:
     def __init__(self, sensor):
