@@ -1,23 +1,29 @@
+from hardware import BalanceMotor, DistanceSensor, PowerTrain, RobotHub, SlopeSensor
 from pybricks.tools import wait
 
 
 class Controller:
     """Main controller coordinating robot behavior."""
 
+    _instance = None
     @classmethod
-    def init(cls, hardware):
-        """Factory method to initialize controller."""
-        return cls(hardware)
+    def __new__(cls):
+        if cls._instance is not None:
+            return cls._instance
+        
+        instance = super().__new__(cls)
+        cls._instance = instance
+        return instance
 
     def __init__(self, hardware):
-        """Map hardware components."""
-        self.hub = hardware["robot_hub"]
-        self.power_train = hardware["power_train"]
-        self.balance_motor = hardware["balance_motor"]
-        self.slope_sensor = hardware["slope_sensor"]
-        self.distance_sensor = hardware["distance_sensor"]
+        self.hub = RobotHub()
+        self.power_train = PowerTrain()
+        self.balance_motor = BalanceMotor()
+        self.slope_sensor = SlopeSensor()
+        self.distance_sensor = DistanceSensor()
 
         # TODO: Add more system states (running, mode, etc.)
+        # TODO make this an enum that switches state, not a bool for every state!
         self.running = False
 
     def run(self):
@@ -27,7 +33,7 @@ class Controller:
         try:
             while self.running:
                 self.update()
-                wait(100)
+                #wait(100) # why wait? we gotta run at full speed! -> Better: use timing modules
         except KeyboardInterrupt:
             self.stop()
 
