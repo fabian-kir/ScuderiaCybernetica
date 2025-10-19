@@ -1,4 +1,6 @@
 from pybricks.hubs import EV3Brick
+from pybricks.parameters import Button
+from pybricks.media.ev3dev import SoundFile
 
 class RobotHub:
     _instance = None
@@ -30,3 +32,21 @@ class RobotHub:
     def set_led(self, color):
         """Change LED color."""
         self.hub.light.on(color)
+
+    def await_user_confirmation(self, play_button_respond_sound = True):
+        """Wait for user to press and release middle button."""
+
+        # wait for middle button to be pressed
+        while True:
+            if Button.MIDDLE in self.hub.buttons.pressed():
+                break
+
+        # wait for middle button to be released again
+        while True:
+            if Button.MIDDLE not in self.hub.buttons.pressed():
+                break
+
+        if play_button_respond_sound:
+            self.hub.speaker.play_file(SoundFile.CLICK)
+
+        return
