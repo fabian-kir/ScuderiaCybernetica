@@ -29,6 +29,11 @@ class Controller:
         # TODO make this an enum that switches state, not a bool for every state!
         self.running = False
 
+        self.update_handlers: list[callable] = []
+
+    def register_update_handler(self, handler: callable):
+        self.update_handlers.append(handler)
+
 
     def run(self):
         """Main control loop with delta timing using Pybricks StopWatch."""
@@ -50,7 +55,8 @@ class Controller:
     def update(self, dt: float):
         """Periodic update logic."""
         # TODO: Read sensors, decide actions, control motors
-        pass
+        for handler in self.update_handlers:
+            handler(dt)
 
     def stop(self):
         """Stop all motors safely."""
