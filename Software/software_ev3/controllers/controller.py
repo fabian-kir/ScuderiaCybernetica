@@ -44,14 +44,11 @@ class Controller:
                 dt = (now_ms - last_ms) / 1000.0  # convert to seconds
                 last_ms = now_ms
 
-                # expose dt for update(); keep signature of update() unchanged
-                self.time_delta = dt
-
-                self.update()
+                self.update(dt)
         except KeyboardInterrupt:
             self.stop()
 
-    def update(self):
+    def update(self, dt: float):
         """Periodic update logic."""
         # TODO: Read sensors, decide actions, control motors
         pass
