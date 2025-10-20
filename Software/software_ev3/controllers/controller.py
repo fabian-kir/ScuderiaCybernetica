@@ -10,7 +10,6 @@ class Controller:
     """Main controller coordinating robot behavior."""
 
     _instance = None
-    @classmethod
     def __new__(cls):
         if cls._instance is not None:
             return cls._instance
