@@ -2,6 +2,7 @@ from ..config.ports import PORTS
 from pybricks.ev3devices import ColorSensor
 from pybricks.tools import wait
 
+from sklearn.linear_model import LinearRegression
 
 class SlopeSensor:
     _instance = None
@@ -71,6 +72,18 @@ class SlopeSensor:
 
         # Lineare Regression über die Datenpunkte um Funktion zu erhalten
         # Reflexiongrad -> Winkeländerung
+
+        model = LinearRegression()
+        x = list(self.calibration_data.keys())
+        y = list(self.calibration_data.values())
+        model.fit(x, y)
+        print("Calculated a linear regression model to fit reflection strength to slope angle, \nwith a score of:", model.score(x, y))
+        print("slope:", model.coef_)
+        print("intercept:", model.intercept_)
+
+        self.get_angle = lambda self: model.predict([self.sensor.reflection()])[0] # This is not how to add methods: TODO clean this mess up!
+
+        # TODO safe calibration data so it doesn't need to be repeated again and again!
 
         self.calibrated = True
 
