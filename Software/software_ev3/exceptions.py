@@ -1,0 +1,2 @@
+class CalibrationDataDoesntExistsException(Exception):
+    pass

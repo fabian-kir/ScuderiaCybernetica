@@ -32,6 +32,9 @@ class Controller:
         self.update_handlers: list[callable] = []
 
     def register_update_handler(self, handler: callable):
+        """Register a function to be called on every update.
+        THIS SHOULD ONLY EVER BE USED BY CHILDREN OF HARDWAREWRAPPER!!!
+        NO CONTROLLERS MAY USE THIS CLASS!!!"""
         self.update_handlers.append(handler)
 
 

@@ -7,18 +7,10 @@ from ..config.constants import CONSTANTS
 from pybricks.ev3devices import Motor
 
 from ..controllers.controller import Controller
+from hardware_wrapper import HardwareWrapper
 
 
-class PowerTrain:
-    _instance = None
-    def __new__(cls):
-        if cls._instance is not None:
-            return cls._instance
-        
-        instance = super().__new__(cls)
-        cls._instance = instance
-        return instance
-        
+class PowerTrain(HardwareWrapper):
     def __init__(self):
         self.port_left = PORTS["LEFT_MOTOR"]
         self.port_right = PORTS["RIGHT_MOTOR"]
@@ -36,8 +28,6 @@ class PowerTrain:
         self.distances = [] # distance travelled for each update intervall. WARNING: Not adjusted for turns or slopes
         self.turn_angles = [] # angle turned for each update intervall
 
-        Controller().register_update_handler(self.update)
-
         self.default_speed = CONSTANTS["DEFAULT_SPEED"]
 
     def update(self, dt):
@@ -53,6 +43,12 @@ class PowerTrain:
         if speed is None:
             speed = self.default_speed
         self.drive_base.drive(speed, turn_rate)
+
+    def get_absolute_distance(self):
+        return sum(self.distances)
+
+    def travelled_since_last_update(self):
+        return self.drive_base.distance()
 
     def stop(self):
         self.drive_base.stop()

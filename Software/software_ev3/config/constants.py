@@ -2,4 +2,5 @@ CONSTANTS = {
     "WHEEL_DIAMETER": 57,
     "AXLE_TRACK": 120,
     "DEFAULT_SPEED": 200 # in mm/s
+    "X_DISTANCE_AXLE_SLEDS": 15 # in mm
 }

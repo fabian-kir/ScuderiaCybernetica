@@ -2,16 +2,10 @@ from pybricks.hubs import EV3Brick
 from pybricks.parameters import Button
 from pybricks.media.ev3dev import SoundFile
 
-class RobotHub:
-    _instance = None
-    def __new__(cls):
-        if cls._instance is not None:
-            return cls._instance
-        
-        instance = super().__new__(cls)
-        cls._instance = instance
-        return instance
+from Software.software_ev3.hardware.hardware_wrapper import HardwareWrapper
 
+
+class RobotHub(HardwareWrapper):
     def __init__(self, enable_startup_feedback = True):
         print("Setting up the EV3 Hub")
         self.hub = EV3Brick()

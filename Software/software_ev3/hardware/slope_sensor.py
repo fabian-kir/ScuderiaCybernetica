@@ -1,29 +1,38 @@
+from .hardware_wrapper import HardwareWrapper
 from ..config.ports import PORTS
+from ..exceptions import CalibrationDataDoesntExistsException
+
 from pybricks.ev3devices import ColorSensor
 from pybricks.tools import wait
 
 from sklearn.linear_model import LinearRegression
+import json
 
-class SlopeSensor:
-    _instance = None
-    def __new__(cls):
-        if cls._instance is not None:
-            return cls._instance
-        
-        instance = super().__new__(cls)
-        cls._instance = instance
-        return instance
-
+class SlopeSensor(HardwareWrapper):
     def __init__(self):
         self.port = PORTS["COLOR_SENSOR"]
         self.sensor = ColorSensor(self.port)
 
-        self.baseline = None
-        self.calibrated = False
+        self.calibration_model_slope = None
+        self.calibration_model_intercept = None
 
-        self.create_baseline() # TODO maybe this needs to be made more complicated because it might require user intervention like
-                                   # positioning the robot correctly, etc...
-        self.calibrate() # TODO this could be the same as creating the baseline
+        try:
+            self.load_calibration_data()
+        except CalibrationDataDoesntExistsException:
+            self.calibrate()
+
+    def load_calibration_data(self):
+        with open("calibration_data.json", "r") as json_file:
+            calibration_data = json.load(json_file)
+
+            try:
+                self.calibration_model_slope = calibration_data["COLOR_SENSOR_CALIBRATION_SLOPE"]
+                self.calibration_model_intercept = calibration_data["COLOR_SENSOR_CALIBRATION_INTERCEPT"]
+
+                assert self.calibration_model_slope is not None and type(self.calibration_model_slope) == float
+                assert self.calibration_model_intercept is not None and type(self.calibration_model_intercept) == float
+            except (KeyError, AssertionError) as exception:
+                raise CalibrationDataDoesntExistsException("Calibration data does not exist or is corrupted.")
 
     def calibrate(self):
         from robot_hub import RobotHub
@@ -81,12 +90,18 @@ class SlopeSensor:
         print("slope:", model.coef_)
         print("intercept:", model.intercept_)
 
-        self.get_angle = lambda self: model.predict([self.sensor.reflection()])[0] # This is not how to add methods: TODO clean this mess up!
+        # safe calibration data to calibrations.json
+        with open("calibration_data.json", "w") as json_file:
+            json.dump({
+                "COLOR_SENSOR_CALIBRATION_SLOPE": model.coef_[0],
+                "COLOR_SENSOR_CALIBRATION_INTERCEPT": model.intercept_
+            }, json_file)
 
-        # TODO safe calibration data so it doesn't need to be repeated again and again!
+        # happens through an extra load - not really necessary, but good to ensure no hidden bugs are missed in the loading process!
+        self.load_calibration_data()
 
-        self.calibrated = True
-
-    def get_slope(self) -> int:
-        if not self.calibrated:
-            raise RuntimeError("SlopeSensor not calibrated yet.")
+    def get_slope_delta(self):
+        """
+        Returns the current angle between wheels and slope detection sleds.
+        WARNINING: this is only the change in the slope, not slop itself
+        """
