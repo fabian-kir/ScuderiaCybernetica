@@ -10,9 +10,8 @@ class BalanceMotor(HardwareWrapper):
         print("Setting up balance motor on port:", self.port)
         self.motor = Motor(self.port)
 
-    def balance(self, speed):
-        """Run the balance motor to keep robot stable."""
-        self.motor.run(speed)
+    def move_to(self, angle):
+        # TODO
 
     def stop(self):
         """Stop balancing."""

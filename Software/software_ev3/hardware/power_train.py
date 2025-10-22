@@ -45,10 +45,10 @@ class PowerTrain(HardwareWrapper):
         self.drive_base.drive(speed, turn_rate)
 
     def get_absolute_distance(self):
-        return sum(self.distances)
+        return sum(self.distances) + self.drive_base.distance()
 
-    def travelled_since_last_update(self):
-        return self.drive_base.distance()
+    def travelled_since_last_update(self): # in mm
+        return self.distances[-1]
 
     def stop(self):
         self.drive_base.stop()

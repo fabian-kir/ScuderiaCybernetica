@@ -1,3 +1,4 @@
+from .plattform_controller import PlattformController
 from ..hardware.balance_motor import BalanceMotor
 from ..hardware.distance_sensor import DistanceSensor
 from ..hardware.power_train import PowerTrain
@@ -24,6 +25,8 @@ class Controller:
         self.balance_motor = BalanceMotor()
         self.slope_sensor = SlopeSensor()
         self.distance_sensor = DistanceSensor()
+
+        self.plattform_controller = PlattformController()
 
         # TODO: Add more system states (running, mode, etc.)
         # TODO make this an enum that switches state, not a bool for every state!
@@ -57,9 +60,13 @@ class Controller:
 
     def update(self, dt: float):
         """Periodic update logic."""
-        # TODO: Read sensors, decide actions, control motors
+
+        #IMPORTANT: First .update to anybody registered...
         for handler in self.update_handlers:
             handler(dt)
+
+        #          ... then .control() to subcontrollers
+        self.plattform_controller.control(dt)
 
     def stop(self):
         """Stop all motors safely."""
