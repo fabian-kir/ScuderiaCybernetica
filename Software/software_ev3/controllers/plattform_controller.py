@@ -11,7 +11,6 @@ from Software.software_ev3.hardware.slope_sensor import SlopeSensor
 
 class PlattformController:
     def __init__(self):
-        main_controller = Controller()
         self.slope_sensor = SlopeSensor()
         self.power_train = PowerTrain()
         self.balance_motor = BalanceMotor()
