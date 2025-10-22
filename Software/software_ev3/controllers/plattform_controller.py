@@ -17,14 +17,14 @@ class PlattformController:
 
         self.total_angle = 0
 
-        self.time_shedule = TimeFloorSchedule() # Mapped zurückgelegten Weg zu einzustellendem Winkel des kleinen Motors
+        self.distance_shedule = TimeFloorSchedule() # Mapped zurückgelegten Weg zu einzustellendem Winkel des kleinen Motors
         self.drive_axle_sleds_distance = CONSTANTS["DRIVE_AXLE_SLED_DISTANCE"]
 
     def update(self, dt):
         raise Exception("PlattformController is not supposed to be updated directly. Only Hardware Components should be updated. Controller ticks happen due to .control()")
 
     def _adjust_small_motor(self):
-        angle = self.time_shedule.consume(self.power_train.get_absolute_distance())
+        angle = self.distance_shedule.consume(self.power_train.get_absolute_distance())
         self.balance_motor.move_to(angle)
 
     def control(self, dt):
@@ -33,7 +33,7 @@ class PlattformController:
         d_angle = self.slope_sensor.get_slope_delta()
 
         self.total_angle += d_angle * ds
-        self.time_shedule.put(total_distance + self.drive_axle_sleds_distance, -self.total_angle)
+        self.distance_shedule.put(total_distance + self.drive_axle_sleds_distance, -self.total_angle)
 
 
 
