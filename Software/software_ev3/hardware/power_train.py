@@ -32,17 +32,27 @@ class PowerTrain(HardwareWrapper):
 
     def update(self, dt):
         self.time_intervalls.append(dt)
-        self.distances.append(self.drive_base.distance())
+        # self.distances.append(self.drive_base.distance()) -> this measurement is not exact enough, as with high update frequency, this only gives 0 or 1 as values
+        self.distances.append(dt * self.get_speed()) # this measurement will hopefully be more exact, testing required!
         self.turn_angles.append(self.drive_base.angle())
         self.drive_base.reset()
+
+    def get_speed(self):
+        return self.speed
+
+    def set_speed(self, speed):
+        # TODO
+        ...
 
     def drive(self, speed=None, turn_rate=0.0, slope=0.0):
         # TODO adjust speed for slope: We should decide: Would we want to have the robot drive faster as slope increases, so that the
         #      speed along the floor-plane stays constant, so we do not introduce any swings on the plattform?
 
         if speed is None:
-            speed = self.default_speed
-        self.drive_base.drive(speed, turn_rate)
+            self.speed = self.default_speed
+        else:
+            self.speed = speed
+        self.drive_base.drive(self.speed, turn_rate)
 
     def get_absolute_distance(self):
         return sum(self.distances) + self.drive_base.distance()
