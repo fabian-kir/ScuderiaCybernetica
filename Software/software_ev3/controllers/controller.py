@@ -32,8 +32,8 @@ class Controller:
         # TODO make this an enum that switches state, not a bool for every state!
         self.running = False
 
-        self.update_handlers: list[callable] = []
-
+        self.update_handlers = []
+        
     def register_update_handler(self, handler: callable):
         """Register a function to be called on every update.
         THIS SHOULD ONLY EVER BE USED BY CHILDREN OF HARDWAREWRAPPER!!!

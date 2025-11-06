@@ -1,12 +1,11 @@
 from pybricks.robotics import DriveBase
 
-from Software.software_ev3.config.constants import CONSTANTS
-from Software.software_ev3.controllers.controller import Controller
-from Software.software_ev3.core.utils import TimeFloorSchedule
-from Software.software_ev3.hardware import slope_sensor
-from Software.software_ev3.hardware.balance_motor import BalanceMotor
-from Software.software_ev3.hardware.power_train import PowerTrain
-from Software.software_ev3.hardware.slope_sensor import SlopeSensor
+from config.constants import CONSTANTS
+from core.utils import TimeFloorSchedule
+from hardware import slope_sensor
+from hardware.balance_motor import BalanceMotor
+from hardware.power_train import PowerTrain
+from hardware.slope_sensor import SlopeSensor
 
 
 class PlattformController:

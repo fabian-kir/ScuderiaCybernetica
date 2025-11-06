@@ -1,3 +1,4 @@
+#!/usr/bin/env pybricks-micropython
 from controllers.controller import Controller
 
 def main():
