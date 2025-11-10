@@ -8,9 +8,12 @@ from pybricks.ev3devices import Motor
 from pybricks.tools import wait
 
 from controllers.controller import Controller
+
+from Software.software_ev3.utils.singleton import singleton
 from hardware_wrapper import HardwareWrapper
 
-class DriveMotor(HardwareWrapper):
+@singleton
+class DriveMotor:
     def __init__(self):
         self.port = PORTS["DRIVE_MOTOR"]
 

@@ -4,8 +4,11 @@ from pybricks.media.ev3dev import SoundFile
 
 from hardware.hardware_wrapper import HardwareWrapper
 
+from Software.software_ev3.utils.singleton import singleton
 
-class RobotHub(HardwareWrapper):
+
+@singleton
+class RobotHub:
     def __init__(self, enable_startup_feedback = True):
         print("Setting up the EV3 Hub")
         self.hub = EV3Brick()

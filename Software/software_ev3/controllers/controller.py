@@ -7,27 +7,21 @@ from hardware.robot_hub import RobotHub
 from hardware.slope_sensor import SlopeSensor
 from pybricks.tools import StopWatch
 
+from controllers.plattform_controller import PlattformController
+
 @singleton
 class Controller:
     """Main controller coordinating robot behavior."""
     def __init__(self):
-        self.update_handlers= []
-
         self.hub = RobotHub()
         self.balance_motor = BalanceMotors()
         self.slope_sensor = SlopeSensor()
         self.distance_sensor = DistanceSensor()
+        self.plattform_controller = PlattformController()
 
-        # self.plattform_controller = PlattformController()
+        self.to_update = [self.hub, self.balance_motor, self.slope_sensor, self.distance_sensor, self.plattform_controller]
 
         self.running = False
-
-    def register_update_handler(self, handler: callable):
-        """Register a function to be called on every update.
-        THIS SHOULD ONLY EVER BE USED BY CHILDREN OF HARDWAREWRAPPER!!!
-        NO CONTROLLERS MAY USE THIS CLASS!!!"""
-        self.update_handlers.append(handler)
-
 
     def run(self):
         """Main control loop with delta timing using Pybricks StopWatch."""
@@ -48,13 +42,8 @@ class Controller:
 
     def update(self, dt: float):
         """Periodic update logic."""
-
-        #IMPORTANT: First .update to anybody registered...
-        for handler in self.update_handlers:
-            handler(dt)
-
-        #          ... then .control() to subcontrollers
-        # self.plattform_controller.control(dt)
+        for component in self.to_update:
+            component.update(dt)
 
     def stop(self):
         """Stop all motors safely."""

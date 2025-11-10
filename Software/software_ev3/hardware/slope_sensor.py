@@ -7,7 +7,11 @@ from pybricks.tools import wait
 
 import json
 
-class SlopeSensor(HardwareWrapper):
+from Software.software_ev3.utils.singleton import singleton
+
+
+@singleton
+class SlopeSensor:
     def __init__(self):
         self.port = PORTS["COLOR_SENSOR"]
         self.sensor = ColorSensor(self.port)

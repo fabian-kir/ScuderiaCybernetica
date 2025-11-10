@@ -3,8 +3,11 @@ from pybricks.ev3devices import Motor
 
 from hardware.hardware_wrapper import HardwareWrapper
 
+from Software.software_ev3.utils.singleton import singleton
 
-class BalanceMotors(HardwareWrapper):
+
+@singleton
+class BalanceMotors:
     def __init__(self):
         print("Setting up Balance Motors")
         pass

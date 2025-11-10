@@ -2,7 +2,11 @@ from config.ports import PORTS
 from hardware.hardware_wrapper import HardwareWrapper
 from pybricks.ev3devices import UltrasonicSensor
 
-class DistanceSensor(HardwareWrapper):
+from Software.software_ev3.utils.singleton import singleton
+
+
+@singleton
+class DistanceSensor:
     def __init__(self):
         self.port = PORTS["ULTRASONIC_SENSOR"]
         print("Setting up distance sensor on port:", self.port)
