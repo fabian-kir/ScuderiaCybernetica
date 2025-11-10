@@ -1,10 +1,9 @@
-from abc import ABCMeta, abstractmethod
-from ..controllers.controller import Controller
-
-class HardwareWrapper(metaclass=ABCMeta):
+class HardwareWrapper:
     _instance = None
 
     def __new__(cls):
+        from controllers.controller import Controller
+
         if cls._instance is not None:
             return cls._instance
 
@@ -13,6 +12,5 @@ class HardwareWrapper(metaclass=ABCMeta):
         Controller().register_update_handler(instance.update)
         return instance
 
-    @abstractmethod
     def update(self, dt):
-        pass
+        raise Exception("this is an abstract method")

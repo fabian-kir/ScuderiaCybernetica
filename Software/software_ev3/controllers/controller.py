@@ -1,9 +1,8 @@
-from .plattform_controller import PlattformController
-from ..hardware.balance_motor import BalanceMotor
-from ..hardware.distance_sensor import DistanceSensor
-from ..hardware.power_train import PowerTrain
-from ..hardware.robot_hub import RobotHub
-from ..hardware.slope_sensor import SlopeSensor
+# from .plattform_controller import PlattformController
+from hardware.balance_motor import BalanceMotors
+from hardware.distance_sensor import DistanceSensor
+from hardware.robot_hub import RobotHub
+from hardware.slope_sensor import SlopeSensor
 from pybricks.tools import StopWatch
 
 
@@ -20,20 +19,17 @@ class Controller:
         return instance
 
     def __init__(self):
+        self.update_handlers= []
+
         self.hub = RobotHub()
-        self.power_train = PowerTrain()
-        self.balance_motor = BalanceMotor()
+        self.balance_motor = BalanceMotors()
         self.slope_sensor = SlopeSensor()
         self.distance_sensor = DistanceSensor()
 
-        self.plattform_controller = PlattformController()
+        # self.plattform_controller = PlattformController()
 
-        # TODO: Add more system states (running, mode, etc.)
-        # TODO make this an enum that switches state, not a bool for every state!
         self.running = False
 
-        self.update_handlers = []
-        
     def register_update_handler(self, handler: callable):
         """Register a function to be called on every update.
         THIS SHOULD ONLY EVER BE USED BY CHILDREN OF HARDWAREWRAPPER!!!
@@ -66,7 +62,7 @@ class Controller:
             handler(dt)
 
         #          ... then .control() to subcontrollers
-        self.plattform_controller.control(dt)
+        # self.plattform_controller.control(dt)
 
     def stop(self):
         """Stop all motors safely."""

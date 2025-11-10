@@ -2,12 +2,12 @@ import warnings
 
 from pybricks.robotics import DriveBase
 
-from ..config.ports import PORTS
-from ..config.constants import CONSTANTS
+from config.ports import PORTS
+from config.constants import CONSTANTS
 from pybricks.ev3devices import Motor
 from pybricks.tools import wait
 
-from ..controllers.controller import Controller
+from controllers.controller import Controller
 from hardware_wrapper import HardwareWrapper
 
 class DriveMotor(HardwareWrapper):

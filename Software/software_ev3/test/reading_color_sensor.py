@@ -1,3 +1,5 @@
+#!/usr/bin/env pybricks-micropython
+
 from pybricks.hubs import EV3Brick
 from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
                                  InfraredSensor, UltrasonicSensor, GyroSensor)
@@ -10,6 +12,7 @@ from pybricks.media.ev3dev import SoundFile, ImageFile
 ev3 = EV3Brick()
 
 color_sensor = ColorSensor(Port.S1)
+ultrasonic_sensor = UltrasonicSensor(Port.S2)
 
-for i in range (1_000_000):
-    print(color_sensor.reflection())
+while True:
+    print("Color Sensor:", color_sensor.reflection(), "Ultrasonic Distance:", ultrasonic_sensor.distance())

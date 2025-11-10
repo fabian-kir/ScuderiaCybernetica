@@ -2,7 +2,7 @@ from pybricks.hubs import EV3Brick
 from pybricks.parameters import Button
 from pybricks.media.ev3dev import SoundFile
 
-from Software.software_ev3.hardware.hardware_wrapper import HardwareWrapper
+from hardware.hardware_wrapper import HardwareWrapper
 
 
 class RobotHub(HardwareWrapper):
