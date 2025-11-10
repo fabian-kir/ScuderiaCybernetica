@@ -1,3 +1,5 @@
+from utils.singleton import singleton
+
 # from .plattform_controller import PlattformController
 from hardware.balance_motor import BalanceMotors
 from hardware.distance_sensor import DistanceSensor
@@ -5,19 +7,9 @@ from hardware.robot_hub import RobotHub
 from hardware.slope_sensor import SlopeSensor
 from pybricks.tools import StopWatch
 
-
+@singleton
 class Controller:
     """Main controller coordinating robot behavior."""
-
-    _instance = None
-    def __new__(cls):
-        if cls._instance is not None:
-            return cls._instance
-        
-        instance = super().__new__(cls)
-        cls._instance = instance
-        return instance
-
     def __init__(self):
         self.update_handlers= []
 
