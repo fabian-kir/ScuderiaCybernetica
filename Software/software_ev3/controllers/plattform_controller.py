@@ -2,7 +2,7 @@ from pybricks.robotics import DriveBase
 
 from config.constants import CONSTANTS
 from hardware import slope_sensor
-from hardware.balance_motor import BalanceMotors
+from hardware.plattform_motors import PlattformMotors
 from hardware.slope_sensor import SlopeSensor
 
 

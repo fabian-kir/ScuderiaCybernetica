@@ -1,7 +1,7 @@
 from utils.singleton import singleton
 
 # from .plattform_controller import PlattformController
-from hardware.balance_motor import BalanceMotors
+from hardware.plattform_motors import PlattformMotors
 from hardware.distance_sensor import DistanceSensor
 from hardware.robot_hub import RobotHub
 from hardware.slope_sensor import SlopeSensor
@@ -14,17 +14,19 @@ class Controller:
     """Main controller coordinating robot behavior."""
     def __init__(self):
         self.hub = RobotHub()
-        self.balance_motor = BalanceMotors()
+        self.plattform_motors = PlattformMotors()
         self.slope_sensor = SlopeSensor()
         self.distance_sensor = DistanceSensor()
         self.plattform_controller = PlattformController()
 
-        self.to_update = [self.hub, self.balance_motor, self.slope_sensor, self.distance_sensor, self.plattform_controller]
+        self.to_update = [self.hub, self.plattform_motors, self.slope_sensor, self.distance_sensor, self.plattform_controller]
 
         self.running = False
 
     def run(self):
         """Main control loop with delta timing using Pybricks StopWatch."""
+
+        self.plattform_motors.move_plattform(180, 180)
 
         self.running = True
         sw = StopWatch()          # starts at 0 ms

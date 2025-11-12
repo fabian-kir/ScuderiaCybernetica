@@ -47,15 +47,27 @@ class EmulatorUI:
 		if self._initialized:
 			try:
 				dpg.render_dearpygui_frame()
+				# Always update motor angles (they integrate continuously)
 				# Refresh display periodically (every few calls)
 				if not hasattr(self, '_refresh_counter'):
 					self._refresh_counter = 0
 				self._refresh_counter += 1
+				# Update motor angles every call, refresh display every 5 calls
+				self._update_motor_angles()
 				if self._refresh_counter >= 5:  # Refresh every 5 calls
 					self._refresh_counter = 0
 					self.refresh()
 			except Exception:
 				pass  # Ignore errors if window is closed
+	
+	def _update_motor_angles(self):
+		"""Update motor angles by integrating speed over time."""
+		# This triggers angle integration by accessing motors
+		# get_motors() now automatically updates angles for all motors
+		try:
+			EMU_STATE.get_motors()  # This updates angles automatically
+		except Exception:
+			pass
 
 	def refresh(self):
 		"""Refresh the UI display."""
@@ -63,10 +75,25 @@ class EmulatorUI:
 			return
 		
 		try:
+			# Check for completed motor commands during refresh
+			self._check_motor_commands()
 			self._refresh_motors()
 			self._refresh_sensors()
 		except Exception:
 			pass  # Ignore errors during refresh
+	
+	def _check_motor_commands(self):
+		"""Check all motors for completed background commands."""
+		# get_motors() already updates angles and checks completion
+		motors = EMU_STATE.get_motors()
+		# Additional check for command completion
+		for m in motors:
+			try:
+				result = EMU_STATE.set_motor(m.port, power=m.power, speed=m.speed,
+				                    target_speed=m.target_speed, using_run_mode=m.using_run_mode)
+				# Note: Completion handling happens in Motor class methods
+			except Exception:
+				pass  # Ignore errors
 
 	def _refresh_motors(self):
 		"""Update motor display."""
@@ -78,7 +105,8 @@ class EmulatorUI:
 		else:
 			lines = []
 			for m in motors:
-				lines.append(f"Port {m.port}: Power={m.power:+6.1f}%  Speed={m.speed:+6.1f}")
+				angle_status = f"Angle={m.angle:+7.1f}°" if m.using_run_mode else "Angle=N/A (dc mode)"
+				lines.append(f"Port {m.port}: Power={m.power:+6.1f}%  Speed={m.speed:+6.1f}  {angle_status}")
 			motor_text = "\n".join(lines)
 		
 		# Update text if tag exists
