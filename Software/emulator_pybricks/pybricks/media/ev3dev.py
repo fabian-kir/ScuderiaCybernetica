@@ -1,0 +1,4 @@
+class SoundFile:
+	CLICK = "CLICK"
+
+

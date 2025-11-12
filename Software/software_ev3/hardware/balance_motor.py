@@ -1,9 +1,7 @@
 from config.ports import PORTS
 from pybricks.ev3devices import Motor
 
-from hardware.hardware_wrapper import HardwareWrapper
-
-from Software.software_ev3.utils.singleton import singleton
+from utils.singleton import singleton
 
 
 @singleton
@@ -12,5 +10,5 @@ class BalanceMotors:
         print("Setting up Balance Motors")
         pass
 
-    def update(dt):
+    def update(self, dt):
         print("TODO")

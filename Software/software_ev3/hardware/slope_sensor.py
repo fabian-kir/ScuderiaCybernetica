@@ -1,4 +1,3 @@
-from hardware.hardware_wrapper import HardwareWrapper
 from config.ports import PORTS
 from exceptions import CalibrationDataDoesntExistsException
 
@@ -7,7 +6,7 @@ from pybricks.tools import wait
 
 import json
 
-from Software.software_ev3.utils.singleton import singleton
+from utils.singleton import singleton
 
 
 @singleton
@@ -90,3 +89,6 @@ class SlopeSensor:
         Returns the current angle between wheels and slope detection sleds.
         WARNINING: this is only the change in the slope, not slop itself
         """
+
+    def update(self, dt):
+        pass

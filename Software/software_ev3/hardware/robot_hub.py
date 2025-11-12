@@ -2,9 +2,7 @@ from pybricks.hubs import EV3Brick
 from pybricks.parameters import Button
 from pybricks.media.ev3dev import SoundFile
 
-from hardware.hardware_wrapper import HardwareWrapper
-
-from Software.software_ev3.utils.singleton import singleton
+from utils.singleton import singleton
 
 
 @singleton
@@ -47,3 +45,7 @@ class RobotHub:
             self.hub.speaker.play_file(SoundFile.CLICK)
 
         return
+
+    def update(self, dt):
+        """Periodic update logic."""
+        pass

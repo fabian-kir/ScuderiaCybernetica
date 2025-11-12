@@ -5,7 +5,7 @@ from hardware.balance_motor import BalanceMotors
 from hardware.distance_sensor import DistanceSensor
 from hardware.robot_hub import RobotHub
 from hardware.slope_sensor import SlopeSensor
-from pybricks.tools import StopWatch
+from pybricks.tools import StopWatch, wait
 
 from controllers.plattform_controller import PlattformController
 
@@ -37,6 +37,9 @@ class Controller:
                 last_ms = now_ms
 
                 self.update(dt)
+                
+                # Add small delay to yield control to UI and prevent excessive CPU usage
+                wait(10)  # 10ms delay allows UI to remain responsive
         except KeyboardInterrupt:
             self.stop()
 
