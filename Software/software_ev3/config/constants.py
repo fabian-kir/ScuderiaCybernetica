@@ -24,4 +24,11 @@ CONSTANTS = {
     
     # Stop detection threshold
     "STOP_SPEED_THRESHOLD": 5,  # Speed threshold in deg/s below which motor is considered stopped
+    
+    # Speed compensation for resistance/slope
+    # Linear factor: how much to increase target speed per unit of resistance increase
+    # Formula: adjusted_target_speed = base_target_speed + (resistance - base_resistance) * SPEED_COMPENSATION_PER_RESISTANCE
+    # Higher resistance (uphill) = higher target speed to maintain constant velocity
+    "SPEED_COMPENSATION_PER_RESISTANCE": 20.0,  # deg/s per resistance unit (tune based on testing)
+    "BASE_RESISTANCE": 2.0,  # Reference resistance value (default motor resistance)
 }

@@ -18,7 +18,8 @@ class DriveMotor:
         self.motor = Motor(self.port)
         self.motor.reset_angle(0)
 
-        self.target_speed = 0
+        self.base_target_speed = 0  # Base target speed set by drive()
+        self.target_speed = 0  # Adjusted target speed (base + resistance compensation)
         self.power = 0
         self.power_per_speed = CONSTANTS["POWER_PER_SPEED"]
 
@@ -31,10 +32,40 @@ class DriveMotor:
         self.power_min, self.power_max = -100, 100
 
         self._last_speed = 0
+        
+        # Resistance compensation parameters
+        self.speed_compensation_per_resistance = CONSTANTS.get("SPEED_COMPENSATION_PER_RESISTANCE", 5.0)
+        self.base_resistance = CONSTANTS.get("BASE_RESISTANCE", 2.0)
 
         RobotHub().print("Set up drive motor on port:", self.port)
 
+    def _get_current_resistance(self):
+        """Get current motor resistance from emulator state, or return base resistance."""
+        try:
+            # Try to import EMU_STATE from emulator (only available in emulator mode)
+            from pybricks.state import EMU_STATE
+            motors = EMU_STATE.get_motors()
+            port_str = str(self.port)
+            for m in motors:
+                if str(m.port) == port_str:
+                    return m.resistance
+            return self.base_resistance
+        except (ImportError, AttributeError):
+            # Not in emulator mode or EMU_STATE not available
+            return self.base_resistance
+    
+    def _update_target_speed_with_resistance_compensation(self):
+        """Update target speed based on current resistance to maintain constant velocity."""
+        current_resistance = self._get_current_resistance()
+        resistance_delta = current_resistance - self.base_resistance
+        # Linear compensation: higher resistance = higher target speed
+        speed_adjustment = resistance_delta * self.speed_compensation_per_resistance
+        self.target_speed = self.base_target_speed + speed_adjustment
+
     def update(self, dt):
+        # Update target speed based on current resistance
+        self._update_target_speed_with_resistance_compensation()
+        
         # Read speed and compute error (target - actual)
         raw_speed = self.motor.speed()
 
@@ -70,13 +101,16 @@ class DriveMotor:
         self.motor.dc(int(self.power))
 
     def drive(self, speed, slope=0):
-        self.target_speed = speed
+        self.base_target_speed = speed
+        # Update target speed with resistance compensation
+        self._update_target_speed_with_resistance_compensation()
         # Reset integral to prevent windup when changing targets
         self.integral = 0.0
         # Note: slope parameter is reserved for future use (e.g., acceleration limiting)
 
     def stop(self, brake_motors=True, hold_after=True, timeout_ms=600):
         # Request zero speed
+        self.base_target_speed = 0
         self.target_speed = 0
 
         # Optionally apply a short reverse pulse to actively brake
