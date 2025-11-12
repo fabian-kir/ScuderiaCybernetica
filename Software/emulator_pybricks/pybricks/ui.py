@@ -6,6 +6,7 @@ class EmulatorUI:
 	def __init__(self):
 		self._initialized = False
 		self._sensor_inputs = {}  # Store input field references
+		self._motor_resistance_inputs = {}  # Store resistance input field references for DC mode motors
 
 	def initialize(self):
 		"""Initialize the UI window."""
@@ -24,6 +25,7 @@ class EmulatorUI:
 			# Motors section
 			with dpg.collapsing_header(label="Motors", default_open=True):
 				dpg.add_text("Motor Status", tag="motors_text")
+				dpg.add_group(tag="motors_resistance_container")
 			
 			dpg.add_separator()
 			
@@ -78,6 +80,7 @@ class EmulatorUI:
 			# Check for completed motor commands during refresh
 			self._check_motor_commands()
 			self._refresh_motors()
+			self._refresh_motor_resistance_controls()
 			self._refresh_sensors()
 		except Exception:
 			pass  # Ignore errors during refresh
@@ -112,6 +115,99 @@ class EmulatorUI:
 		# Update text if tag exists
 		if dpg.does_item_exist("motors_text"):
 			dpg.set_value("motors_text", motor_text)
+	
+	def _refresh_motor_resistance_controls(self):
+		"""Update motor resistance controls (only for DC mode motors)."""
+		motors = EMU_STATE.get_motors()
+		
+		# Filter to only DC mode motors
+		dc_motors = [m for m in motors if not m.using_run_mode]
+		
+		# Check if we need to rebuild resistance UI (motors changed or mode changed)
+		current_dc_ports = {m.port for m in dc_motors}
+		existing_ports = set(self._motor_resistance_inputs.keys())
+		
+		if current_dc_ports != existing_ports:
+			# Rebuild resistance UI if DC motors changed
+			if dpg.does_item_exist("motors_resistance_container"):
+				dpg.delete_item("motors_resistance_container", children_only=True)
+			self._motor_resistance_inputs.clear()
+			
+			# Create resistance controls for DC mode motors
+			if not dc_motors:
+				# No DC mode motors, show nothing or a message
+				pass
+			else:
+				dpg.add_text("Motor Resistance (DC Mode Only):", parent="motors_resistance_container")
+				for m in dc_motors:
+					port_str = str(m.port)
+					with dpg.group(horizontal=True, parent="motors_resistance_container"):
+						dpg.add_text(f"Port {port_str}:")
+						# Create input field for resistance
+						input_tag = f"motor_resistance_{port_str}"
+						
+						# Create callback function with proper closure
+						def make_resistance_callback(port):
+							return lambda sender, app_data: self._on_motor_resistance_change(port, app_data)
+						
+						def make_resistance_set_callback(port):
+							return lambda sender, app_data: self._on_motor_resistance_set(port)
+						
+						dpg.add_input_float(
+							label="Resistance",
+							default_value=m.resistance,
+							tag=input_tag,
+							width=100,
+							callback=make_resistance_callback(port_str),
+							on_enter=True,
+							min_value=0.1,
+							max_value=10.0,
+							format="%.2f"
+						)
+						dpg.add_button(
+							label="Set",
+							callback=make_resistance_set_callback(port_str)
+						)
+						self._motor_resistance_inputs[port_str] = input_tag
+		else:
+			# Update existing input fields with current resistance values (but don't overwrite user input)
+			# Only update if the value changed significantly (more than 0.01) to avoid interfering with user typing
+			for port_str, input_tag in self._motor_resistance_inputs.items():
+				if dpg.does_item_exist(input_tag):
+					for m in dc_motors:
+						if str(m.port) == port_str:
+							current_ui_value = dpg.get_value(input_tag)
+							# Only update if difference is significant (user might be typing)
+							if abs(current_ui_value - m.resistance) > 0.01:
+								dpg.set_value(input_tag, m.resistance)
+							break
+	
+	def _on_motor_resistance_change(self, port, value):
+		"""Handle motor resistance value change from input field (on Enter key)."""
+		if port:
+			try:
+				resistance = float(value)
+				# Clamp to reasonable range
+				resistance = max(0.1, min(10.0, resistance))
+				EMU_STATE.set_motor_resistance(port, resistance)
+			except (ValueError, TypeError):
+				pass  # Ignore invalid values
+	
+	def _on_motor_resistance_set(self, port):
+		"""Handle motor resistance set button click."""
+		if port:
+			input_tag = f"motor_resistance_{port}"
+			if dpg.does_item_exist(input_tag):
+				try:
+					value = dpg.get_value(input_tag)
+					resistance = float(value)
+					# Clamp to reasonable range
+					resistance = max(0.1, min(10.0, resistance))
+					EMU_STATE.set_motor_resistance(port, resistance)
+					# Update UI to show clamped value
+					dpg.set_value(input_tag, resistance)
+				except (ValueError, TypeError):
+					pass  # Ignore invalid values
 
 	def _refresh_sensors(self):
 		"""Update sensor display and inputs."""

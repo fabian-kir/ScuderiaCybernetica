@@ -7,18 +7,16 @@ from config.constants import CONSTANTS
 from pybricks.ev3devices import Motor
 from pybricks.tools import wait
 
-from controllers.controller import Controller
-
-from Software.software_ev3.utils.singleton import singleton
-from hardware_wrapper import HardwareWrapper
+from utils.singleton import singleton
+from hardware.robot_hub import RobotHub
 
 @singleton
 class DriveMotor:
     def __init__(self):
         self.port = PORTS["DRIVE_MOTOR"]
 
-        print("Setting up drive motor on port:", self.port)
         self.motor = Motor(self.port)
+        self.motor.reset_angle(0)
 
         self.target_speed = 0
         self.power = 0
@@ -33,6 +31,8 @@ class DriveMotor:
         self.power_min, self.power_max = -100, 100
 
         self._last_speed = 0
+
+        RobotHub().print("Set up drive motor on port:", self.port)
 
     def update(self, dt):
         # Read speed and compute error (target - actual)
@@ -71,8 +71,9 @@ class DriveMotor:
 
     def drive(self, speed, slope=0):
         self.target_speed = speed
-
+        # Reset integral to prevent windup when changing targets
         self.integral = 0.0
+        # Note: slope parameter is reserved for future use (e.g., acceleration limiting)
 
     def stop(self, brake_motors=True, hold_after=True, timeout_ms=600):
         # Request zero speed
@@ -82,9 +83,9 @@ class DriveMotor:
         if brake_motors:
             v = abs(self.motor.speed())
             # Duty scaled to current speed with safe bounds
-            k = CONSTANTS["BRAKE_K"]  # tune 0.3..1.2
+            k = CONSTANTS.get("BRAKE_K", 0.8)  # tune 0.3..1.2
             duty = int(max(0, min(100, k * v)))
-            pulse_ms = CONSTANTS["BRAKE_PULSE_MS", 80]  # 50..150 typical
+            pulse_ms = CONSTANTS.get("BRAKE_PULSE_MS", 80)  # 50..150 typical
 
             self.motor.dc( -duty )
             wait(pulse_ms)

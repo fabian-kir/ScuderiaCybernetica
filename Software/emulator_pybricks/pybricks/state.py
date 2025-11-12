@@ -12,6 +12,7 @@ class MotorState:
 	target_speed: float = 0.0  # Speed set by run() - used for angle integration
 	last_update_time: float = field(default_factory=time.perf_counter)
 	using_run_mode: bool = False  # True when run() is used, False when dc() is used
+	resistance: float = 2.0  # Power-to-speed ratio for DC mode (only used when using_run_mode=False)
 	# Background command tracking (for wait=False operations)
 	target_angle: float = None  # Target angle for run_angle/run_target (None if not active)
 	target_time_end: float = None  # End time for run_time (None if not active)
@@ -45,7 +46,8 @@ class EmulatorState:
 	              target_speed: float = None, using_run_mode: bool = None,
 	              target_angle: float = None, target_time_end: float = None,
 	              command_then: object = None, command_start_angle: float = None,
-	              command_start_time: float = None, clear_command: bool = False):
+	              command_start_time: float = None, clear_command: bool = False,
+	              resistance: float = None):
 		m = self._motors.setdefault(port, MotorState(port))
 		current_time = time.perf_counter()
 		
@@ -95,6 +97,8 @@ class EmulatorState:
 			m.command_start_angle = command_start_angle
 		if command_start_time is not None:
 			m.command_start_time = command_start_time
+		if resistance is not None:
+			m.resistance = resistance
 		if clear_command:
 			m.target_angle = None
 			m.target_time_end = None
@@ -197,6 +201,11 @@ class EmulatorState:
 
 	def get_pressed_buttons(self) -> List[str]:
 		return [name for name, pressed in self._buttons.items() if pressed]
+
+	def set_motor_resistance(self, port: str, resistance: float):
+		"""Set the resistance (power-to-speed ratio) for a motor in DC mode."""
+		if port in self._motors:
+			self._motors[port].resistance = float(resistance)
 
 	# Backward compatibility methods
 	def set_button_middle(self, pressed: bool):

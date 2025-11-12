@@ -1,6 +1,7 @@
 from .tools import wait
 from .state import EMU_STATE
 from .ui import process_ui_events
+import time
 
 
 class Motor:
@@ -9,6 +10,7 @@ class Motor:
 		EMU_STATE.register_motor(self._port)
 		self._power = 0.0
 		self._speed = 0.0
+		self._last_speed_update_time = time.perf_counter()
 		process_ui_events()
 
 	def reset_angle(self, angle: float):
@@ -41,24 +43,58 @@ class Motor:
 	def dc(self, power: float):
 		# Clamp and set
 		self._power = max(-100.0, min(100.0, float(power)))
-		# crude speed model follows power
-		self._speed += (self._power * 2.0 - self._speed) * 0.3
+		# Update speed based on elapsed time and current resistance
+		self._update_speed()
 		# Use dc mode: we cannot track angle accurately (no target speed)
 		# Clear any active background commands when using dc()
 		result = EMU_STATE.set_motor(self._port, power=self._power, speed=self._speed,
 		                    target_speed=0.0, using_run_mode=False, clear_command=True)
 		self._handle_command_completion(result)
 		process_ui_events()
+	
+	def _update_speed(self):
+		"""Update motor speed based on power, resistance, and elapsed time."""
+		current_time = time.perf_counter()
+		
+		# Get resistance from motor state for power-to-speed conversion
+		motors = EMU_STATE.get_motors()
+		resistance = 2.0  # default fallback
+		for m in motors:
+			if m.port == self._port:
+				resistance = m.resistance
+				break
+		
+		# Calculate elapsed time since last update
+		if self._last_speed_update_time is None:
+			dt = 0.0
+		else:
+			dt = current_time - self._last_speed_update_time
+		
+		# Update speed using time-based dynamics
+		# Target speed is power * resistance (higher resistance = higher speed for same power)
+		# Use exponential approach: speed approaches target with time constant
+		target_speed = self._power * resistance
+		time_constant = 0.1  # seconds - how quickly speed responds to power changes
+		
+		if dt > 0 and dt < 1.0:  # Only update if reasonable time has passed
+			# Exponential approach: speed = speed + (target - speed) * (1 - exp(-dt/tau))
+			# For small dt/tau, this approximates: speed += (target - speed) * dt / tau
+			alpha = min(1.0, dt / time_constant)
+			self._speed += (target_speed - self._speed) * alpha
+		
+		self._last_speed_update_time = current_time
 
 	def speed(self) -> float:
 		# return current emulated speed
+		# Update speed based on elapsed time (important for PID controllers)
+		self._update_speed()
 		# Check for command completion while processing events
 		process_ui_events()
-		# Also check when reading speed
+		# Sync updated speed with MotorState and check for command completion
 		motors = EMU_STATE.get_motors()
 		for m in motors:
 			if m.port == self._port:
-				result = EMU_STATE.set_motor(self._port, power=m.power, speed=m.speed,
+				result = EMU_STATE.set_motor(self._port, power=self._power, speed=self._speed,
 				                    target_speed=m.target_speed, using_run_mode=m.using_run_mode)
 				self._handle_command_completion(result)
 				break
