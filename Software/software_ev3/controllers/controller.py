@@ -3,10 +3,11 @@ from utils.singleton import singleton
 # from .plattform_controller import PlattformController
 from hardware.plattform_motors import PlattformMotors
 from hardware.robot_hub import RobotHub
+from hardware.drive_motor import DriveMotor
+from hardware.ultrasonic_sensor import UltrasonicSensor
+from hardware.color_sensor import ColorSensor
+
 from pybricks.tools import StopWatch, wait
-
-from Software.software_ev3.hardware.drive_motor import DriveMotor
-
 
 @singleton
 class Controller:
@@ -15,8 +16,10 @@ class Controller:
         self.hub = RobotHub()
         self.plattform_motors = PlattformMotors()
         self.drive_motor = DriveMotor()
+        self.ultrasonic_sensor = UltrasonicSensor()
+        self.color_sensor = ColorSensor()
 
-        self.to_update = [self.hub, self.plattform_motors, self.drive_motor]
+        self.to_update = [self.hub, self.plattform_motors, self.drive_motor, self.ultrasonic_sensor, self.color_sensor]
 
         self.running = False
 
