@@ -20,6 +20,10 @@ class RobotHub:
         self.hub.screen.clear()
         self.hub.screen.print(text)
 
+    def print(self, *args):
+        self.hub.screen.print(*args)
+        print(*args)
+
     def beep(self):
         """Make a simple beep."""
         self.hub.speaker.beep()

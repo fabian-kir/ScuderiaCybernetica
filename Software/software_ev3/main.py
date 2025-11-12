@@ -21,7 +21,6 @@ if os.environ.get("EV3_EMULATOR", "0") in ("1", "true", "True", "yes", "YES"):
 from controllers.controller import Controller
 
 def main():
-
 	# Create controller and start behavior
 	controller = Controller()
 	controller.run()

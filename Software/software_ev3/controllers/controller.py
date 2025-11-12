@@ -37,9 +37,7 @@ class Controller:
                 last_ms = now_ms
 
                 self.update(dt)
-                
-                # Add small delay to yield control to UI and prevent excessive CPU usage
-                wait(10)  # 10ms delay allows UI to remain responsive
+
         except KeyboardInterrupt:
             self.stop()
 
