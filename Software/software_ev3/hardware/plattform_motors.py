@@ -5,7 +5,6 @@ from pybricks.parameters import Stop
 from utils.singleton import singleton
 from config.constants import CONSTANTS
 
-from Software.software_ev3.config import constants
 from hardware.robot_hub import RobotHub
 
 

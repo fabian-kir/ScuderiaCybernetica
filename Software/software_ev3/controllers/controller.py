@@ -1,6 +1,5 @@
 from utils.singleton import singleton
 
-# from .plattform_controller import PlattformController
 from hardware.plattform_motors import PlattformMotors
 from hardware.robot_hub import RobotHub
 from hardware.drive_motor import DriveMotor
