@@ -2,12 +2,8 @@ from utils.singleton import singleton
 
 # from .plattform_controller import PlattformController
 from hardware.plattform_motors import PlattformMotors
-from hardware.distance_sensor import DistanceSensor
 from hardware.robot_hub import RobotHub
-from hardware.slope_sensor import SlopeSensor
 from pybricks.tools import StopWatch, wait
-
-from controllers.plattform_controller import PlattformController
 
 from Software.software_ev3.hardware.drive_motor import DriveMotor
 
@@ -19,11 +15,8 @@ class Controller:
         self.hub = RobotHub()
         self.plattform_motors = PlattformMotors()
         self.drive_motor = DriveMotor()
-        self.slope_sensor = SlopeSensor()
-        self.distance_sensor = DistanceSensor()
-        self.plattform_controller = PlattformController()
 
-        self.to_update = [self.hub, self.plattform_motors, self.drive_motor, self.slope_sensor, self.distance_sensor, self.plattform_controller]
+        self.to_update = [self.hub, self.plattform_motors, self.drive_motor]
 
         self.running = False
 
