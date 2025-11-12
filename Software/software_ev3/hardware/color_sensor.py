@@ -16,3 +16,6 @@ class ColorSensor:
     def update(self, dt):
         # TODO
         RobotHub().print("color sensor update not implemented yet")
+
+    def get_reflection(self):
+        return self.sensor.reflection()

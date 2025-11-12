@@ -13,6 +13,11 @@ class UltrasonicSensor:
 
         RobotHub().print("Set up ultrasonic sensor on port:", self.port)
 
+    def calibrate(self):
+
+
     def update(self, dt):
-        # TODO
         RobotHub().print("Ultrasonic sensor update not implemented yet")
+
+    def get_distance(self):
+        return self.sensor.distance()

@@ -10,8 +10,35 @@ from pybricks.tools import wait
 from utils.singleton import singleton
 from hardware.robot_hub import RobotHub
 
+
 @singleton
 class DriveMotor:
+    def __init__(self):
+        self.port = PORTS["DRIVE_MOTOR"]
+        self.motor = Motor(self.port)
+        self.motor.reset_angle(0)
+
+        self.target_speed = 0
+        self.power = 0
+
+    def get_power(self):
+        return self.power
+
+    def get_torque_per_speed(self):
+        self.power / self.motor.speed()
+
+    def drive(self, speed):
+        self.target_speed = speed
+
+    def update(self, dt):
+        current_speed = self.motor.speed()
+        error = self.target_speed - current_speed
+        self.power = error * CONSTANTS["POWER_PER_SPEED"]
+        self.motor.dc(self.power)
+
+
+@singleton
+class DriveMotorPID:
     def __init__(self):
         self.port = PORTS["DRIVE_MOTOR"]
 
