@@ -14,7 +14,7 @@ class UltrasonicSensor:
         RobotHub().print("Set up ultrasonic sensor on port:", self.port)
 
     def calibrate(self):
-
+        RobotHub().print("Ultrasonic sensor calibration is still TODO")
 
     def update(self, dt):
         RobotHub().print("Ultrasonic sensor update not implemented yet")
