@@ -12,6 +12,9 @@ class _Screen:
 		# Print to host console
 		print("[EV3 SCREEN]", *args)
 
+	def draw_text(self, x, y, text):
+		print(f"[EV3 SCREEN] draw text at {x}, {y}: {text}")
+
 
 class _Speaker:
 	def beep(self):
