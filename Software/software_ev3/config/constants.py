@@ -27,7 +27,7 @@ CONSTANTS = {
     # Higher values = faster response but may cause overshoot/oscillation
     # Units: degrees per reflection error unit
     # Typical range: 0.1 - 1.0
-    "PLATFORM_COLOR_KP": 2,
+    "PLATFORM_COLOR_KP": 1,
     
     # Integral gain: angle correction per unit of reflection error per second
     # Eliminates steady-state error but can cause windup if too high
@@ -38,8 +38,8 @@ CONSTANTS = {
     # Derivative gain: angle correction per unit of reflection error rate
     # Dampens oscillations and improves stability
     # Units: degrees per reflection error rate unit
-    # Typical range: 0.01 - 0.2
-    "PLATFORM_COLOR_KD": 0.05,
+    # Typical range: 0.001 - 0.2
+    "PLATFORM_COLOR_KD": 0.005,
     
     # PID gains for ultrasonic sensor-based platform balance (Y-axis)
     # Proportional gain: angle correction per unit of distance error (mm)
@@ -64,7 +64,7 @@ CONSTANTS = {
     # Prevents sudden movements that could impart impulse to objects on platform
     # Lower values = smoother but slower response
     # Higher values = faster response but risk of impulse
-    "PLATFORM_MAX_SPEED_X": 100,  # Maximum speed for X-axis corrections
+    "PLATFORM_MAX_SPEED_X": 40,  # Maximum speed for X-axis corrections
     "PLATFORM_MAX_SPEED_Y": 50,  # Maximum speed for Y-axis corrections
     
     # Maximum angle correction per update cycle (degrees)
@@ -76,6 +76,8 @@ CONSTANTS = {
     # Maximum accumulated integral error to prevent windup
     "PLATFORM_MAX_INTEGRAL_X": 50.0,  # Maximum integral accumulation for X-axis
     "PLATFORM_MAX_INTEGRAL_Y": 50.0,  # Maximum integral accumulation for Y-axis
+
+    "CORRECTION_ERROR_TRESHOLD": 0, # Amount of Value difference for the sensor so that the controller starts to move the plattform
     
     # ============================================================================
     # Drive Motor PID Controller Configuration
