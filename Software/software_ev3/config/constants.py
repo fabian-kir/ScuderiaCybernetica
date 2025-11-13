@@ -1,34 +1,60 @@
+"""
+Robot configuration constants.
+
+This module contains all tunable parameters for the robot's hardware and control systems.
+Constants are organized by subsystem for better maintainability.
+"""
+
 CONSTANTS = {
-    "WHEEL_DIAMETER": 57,
-    "AXLE_TRACK": 120,
-    "GEAR_RATIO_BALANCE_X": 1/1,
-    "GEAR_RATIO_BALANCE_Y": 1/1,
-    "DEFAULT_SPEED_BALANCE_X": 50,
-    "DEFAULT_SPEED_BALANCE_Y": 50,
-    "X_DISTANCE_AXLE_SLEDS": 500, # in mm
-    "POWER_PER_SPEED": .5, # this is the best estimate for d (dc) / d s (for dc is power output and s is speed in mm/s)
+    # ============================================================================
+    # Platform/Balance Motor Configuration
+    # ============================================================================
+    # Gear ratios for balance platform motors
+    # Applied to angle commands: actual_motor_angle = command_angle * gear_ratio
+    "GEAR_RATIO_BALANCE_X": 1/1,  # Gear ratio for X-axis balance motor
+    "GEAR_RATIO_BALANCE_Y": 1/1,  # Gear ratio for Y-axis balance motor
     
-    # PI speed controller gains for drive motor
-    # KP: proportional gain (power per speed error in deg/s)
-    # KI: integral gain (power per speed error per second)
-    "DRIVE_SPEED_KP": 1.0,  # Start conservative, tune up if response is slow
-    "DRIVE_SPEED_KI": 0.2,  # Start low, tune up if steady-state error persists
+    # Default speeds for balance platform motors (deg/s)
+    # Used when no speed is explicitly specified in move_plattform()
+    "DEFAULT_SPEED_BALANCE_X": 50,  # Default speed for X-axis motor
+    "DEFAULT_SPEED_BALANCE_Y": 50,  # Default speed for Y-axis motor
     
-    # Speed filtering (first-order IIR filter)
-    # alpha: 0..1, higher = less filtering (more responsive, more noise)
+    # ============================================================================
+    # Drive Motor PID Controller Configuration
+    # ============================================================================
+    # Proportional gain: power output per speed error (deg/s)
+    # Higher values = faster response but may cause overshoot/oscillation
+    # Typical range: 0.5 - 2.0
+    "DRIVE_SPEED_KP": 1.0,
+    
+    # Integral gain: power output per speed error per second
+    # Eliminates steady-state error but can cause windup if too high
+    # Typical range: 0.1 - 0.5
+    "DRIVE_SPEED_KI": 0.2,
+    
+    # ============================================================================
+    # Drive Motor Speed Filtering
+    # ============================================================================
+    # First-order IIR filter coefficient for speed noise reduction
+    # Range: 0.0 (maximum filtering, slow response) to 1.0 (no filtering, fast response)
+    # Formula: filtered_speed = alpha * raw_speed + (1 - alpha) * previous_filtered_speed
+    # Typical range: 0.2 - 0.5
     "SPEED_FILTER_ALPHA": 0.3,
     
-    # Braking parameters
-    "BRAKE_K": 0.8,  # Brake duty cycle scaling factor (0.3..1.2 typical)
-    "BRAKE_PULSE_MS": 80,  # Duration of reverse brake pulse in milliseconds (50..150 typical)
+    # ============================================================================
+    # Drive Motor Slope/Resistance Compensation
+    # ============================================================================
+    # Reference resistance value representing flat ground conditions
+    # Used as baseline for detecting uphill/downhill slopes
+    # Units: torque_per_power ratio (dimensionless)
+    "BASE_RESISTANCE": 2.0,
     
-    # Stop detection threshold
-    "STOP_SPEED_THRESHOLD": 5,  # Speed threshold in deg/s below which motor is considered stopped
-    
-    # Speed compensation for resistance/slope
-    # Linear factor: how much to increase target speed per unit of resistance increase
-    # Formula: adjusted_target_speed = base_target_speed + (resistance - base_resistance) * SPEED_COMPENSATION_PER_RESISTANCE
+    # Speed compensation factor for slope compensation
+    # How much to increase target speed per unit of resistance increase
+    # Formula: adjusted_target_speed = base_target_speed + 
+    #          (resistance - BASE_RESISTANCE) * SPEED_COMPENSATION_PER_RESISTANCE
     # Higher resistance (uphill) = higher target speed to maintain constant velocity
-    "SPEED_COMPENSATION_PER_RESISTANCE": 20.0,  # deg/s per resistance unit (tune based on testing)
-    "BASE_RESISTANCE": 2.0,  # Reference resistance value (default motor resistance)
+    # Units: deg/s per resistance unit
+    # Typical range: 10.0 - 30.0
+    "SPEED_COMPENSATION_PER_RESISTANCE": 20.0,
 }

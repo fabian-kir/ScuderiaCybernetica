@@ -80,8 +80,7 @@ class DriveMotor:
         Args:
             dt: Time delta in seconds since last update
         """
-        assert dt > 0.0
-        
+
         # Read current motor speed
         raw_speed = self.motor.speed()
         
@@ -110,13 +109,13 @@ class DriveMotor:
         
         # Integral term (with anti-windup)
         self._integral_error += speed_error * dt
-        # Limit integral to prevent windup
+        # Limit integral to prevent windup: clamp to [-max_integral, max_integral]
         max_integral = 100.0 / CONSTANTS["DRIVE_SPEED_KI"]
-        self._integral_error = max(-max_integral, min(max_integral, self._integral_error)) # -max_integral <= _integral_error <= max_integral
+        self._integral_error = max(-max_integral, min(max_integral, self._integral_error))
         integral = CONSTANTS["DRIVE_SPEED_KI"] * self._integral_error
         
         # Derivative term (rate of change of error)
-        error_derivative = (speed_error - self._previous_error) / dt
+        error_derivative = (speed_error - self._previous_error) / dt if dt > 0.0 else 0.0
         # Use KD if available, otherwise 0
         kd = CONSTANTS.get("DRIVE_SPEED_KD", 0.0)
         derivative = kd * error_derivative
