@@ -3,6 +3,7 @@ from config.constants import CONSTANTS
 from pybricks.ev3devices import Motor
 
 from utils.singleton import singleton
+from utils.data_logger import log_data
 
 
 @singleton
@@ -80,6 +81,8 @@ class DriveMotor:
         Args:
             dt: Time delta in seconds since last update
         """
+
+        log_data("motor_x", dt, self.motor.speed())
 
         # Read current motor speed
         raw_speed = self.motor.speed()

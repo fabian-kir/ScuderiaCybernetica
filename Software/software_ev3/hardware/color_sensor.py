@@ -4,9 +4,6 @@ from pybricks.ev3devices import ColorSensor as PybricksColorSensor
 from utils.singleton import singleton
 from hardware.robot_hub import RobotHub
 
-from utils.data_logger import log_data
-
-
 @singleton
 class ColorSensor:
     def __init__(self):
@@ -18,8 +15,7 @@ class ColorSensor:
         RobotHub().print("Set up color sensor on port:", self.port)
 
     def update(self, dt):
-        log_data("reflection_error", dt, self.get_reflection_error())
-
+        pass
     def get_reflection_error(self):
         """Returns the difference between the current reflection and the target."""
         return self.target_reflection - self.sensor.reflection()
