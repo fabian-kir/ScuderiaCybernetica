@@ -54,6 +54,10 @@ class Motor:
 	
 	def _update_speed(self):
 		"""Update motor speed based on power, resistance, and elapsed time."""
+		# Safety check: ensure _speed is initialized
+		if self._speed is None:
+			self._speed = 0.0
+		
 		current_time = time.perf_counter()
 		
 		# Get resistance from motor state for power-to-speed conversion
@@ -98,6 +102,9 @@ class Motor:
 				                    target_speed=m.target_speed, using_run_mode=m.using_run_mode)
 				self._handle_command_completion(result)
 				break
+		# Safety check: ensure we never return None
+		if self._speed is None:
+			self._speed = 0.0
 		return self._speed
 
 	def angle(self) -> float:

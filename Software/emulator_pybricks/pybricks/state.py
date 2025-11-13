@@ -36,7 +36,7 @@ class EmulatorState:
 			"RIGHT": False,
 			"UP": False,
 			"DOWN": False,
-			"MIDDLE": False
+			"CENTER": False
 		}
 
 	def register_motor(self, port: str):
@@ -208,11 +208,11 @@ class EmulatorState:
 			self._motors[port].resistance = float(resistance)
 
 	# Backward compatibility methods
-	def set_button_middle(self, pressed: bool):
-		self.set_button("MIDDLE", pressed)
+	def set_button_center(self, pressed: bool):
+		self.set_button("CENTER", pressed)
 
-	def is_button_middle(self) -> bool:
-		return self.is_button_pressed("MIDDLE")
+	def is_button_center(self) -> bool:
+		return self.is_button_pressed("CENTER")
 
 
 # Singleton

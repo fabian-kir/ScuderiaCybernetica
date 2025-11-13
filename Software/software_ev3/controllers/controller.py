@@ -1,3 +1,5 @@
+import os
+
 from utils.singleton import singleton
 
 from hardware.plattform_motors import PlattformMotors
@@ -9,6 +11,16 @@ from hardware.color_sensor import ColorSensor
 from controllers.plattform_controller import PlattformController
 
 from pybricks.tools import StopWatch, wait
+import time
+
+# Import UI event processor for emulator mode
+if os.environ.get("EV3_EMULATOR", "0") in ("1", "true", "True", "yes", "YES"):
+    try:
+        from pybricks.ui import process_ui_events
+    except ImportError:
+        process_ui_events = None
+else:
+    process_ui_events = None
 
 @singleton
 class Controller:
@@ -45,12 +57,22 @@ class Controller:
                 last_ms = now_ms
 
                 self.update(dt)
+                
+                # Small sleep to prevent excessive CPU usage and allow UI to process
+                time.sleep(0.001)  # 1ms sleep
 
         except KeyboardInterrupt:
             self.stop()
 
     def update(self, dt: float):
         """Periodic update logic."""
+        # Process UI events for emulator (if enabled)
+        if process_ui_events:
+            try:
+                process_ui_events()
+            except Exception:
+                pass  # Ignore errors if window is closed
+        
         for component in self.to_update:
             component.update(dt)
 

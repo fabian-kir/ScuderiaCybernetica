@@ -18,8 +18,6 @@ class Button(Enum):
 	UP = "UP"
 	DOWN = "DOWN"
 	CENTER = "CENTER"
-	MIDDLE = "MIDDLE"
-
 
 class Stop(Enum):
 	COAST = "COAST"

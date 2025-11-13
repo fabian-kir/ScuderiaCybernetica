@@ -1,8 +1,15 @@
 from pybricks.hubs import EV3Brick
 from pybricks.parameters import Button
 from pybricks.media.ev3dev import SoundFile
+import time
 
 from utils.singleton import singleton
+
+# Import UI event processor for emulator mode
+try:
+    from pybricks.ui import process_ui_events
+except ImportError:
+    process_ui_events = None
 
 
 @singleton
@@ -47,13 +54,35 @@ class RobotHub:
 
         # wait for CENTER button to be pressed
         while True:
-            if Button.CENTER in self.hub.buttons.pressed():
+            # Process UI events to allow button presses to register (for emulator)
+            if process_ui_events:
+                try:
+                    process_ui_events()
+                except Exception:
+                    pass
+            
+            pressed = self.hub.buttons.pressed()
+            if pressed is not None and Button.CENTER in pressed:
                 break
+            
+            # Small sleep to prevent excessive CPU usage and allow UI to update
+            time.sleep(0.01)  # 10ms sleep
 
         # wait for CENTER button to be released again
         while True:
-            if Button.CENTER not in self.hub.buttons.pressed():
+            # Process UI events to allow button releases to register (for emulator)
+            if process_ui_events:
+                try:
+                    process_ui_events()
+                except Exception:
+                    pass
+            
+            pressed = self.hub.buttons.pressed()
+            if pressed is None or Button.CENTER not in pressed:
                 break
+            
+            # Small sleep to prevent excessive CPU usage and allow UI to update
+            time.sleep(0.01)  # 10ms sleep
 
         if play_button_respond_sound:
             self.hub.speaker.play_file(SoundFile.CLICK)

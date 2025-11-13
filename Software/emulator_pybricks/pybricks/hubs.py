@@ -1,5 +1,5 @@
 from .state import EMU_STATE
-from .ui import ensure_ui_started, process_ui_events
+from .ui import ensure_ui_started
 from .parameters import Button
 
 
@@ -13,7 +13,8 @@ class _Screen:
 		print("[EV3 SCREEN]", *args)
 
 	def draw_text(self, x, y, text):
-		print(f"[EV3 SCREEN] draw text at {x}, {y}: {text}")
+		# Print to host console with position info
+		print(f"[EV3 SCREEN] ({x},{y}): {text}")
 
 
 class _Speaker:
@@ -31,7 +32,6 @@ class _Light:
 
 class _Buttons:
 	def pressed(self):
-		process_ui_events()
 		pressed_buttons = []
 		for button_name in EMU_STATE.get_pressed_buttons():
 			# Map button names to Button enum values
@@ -43,8 +43,8 @@ class _Buttons:
 				pressed_buttons.append(Button.UP)
 			elif button_name == "DOWN":
 				pressed_buttons.append(Button.DOWN)
-			elif button_name == "MIDDLE":
-				pressed_buttons.append(Button.MIDDLE)
+			elif button_name == "CENTER":
+				pressed_buttons.append(Button.CENTER)
 		return pressed_buttons
 
 
