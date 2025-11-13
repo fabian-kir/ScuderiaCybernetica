@@ -198,6 +198,5 @@ def main():
         print("Error: No plotting library available. Install matplotlib or plotly.")
         sys.exit(1)
 
-
 if __name__ == '__main__':
     main()
