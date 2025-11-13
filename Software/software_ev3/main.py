@@ -7,7 +7,7 @@ try:
 except ImportError:
 	pathlib_exists = False
 
-from Software.emulator_pybricks.pybricks.parameters import Port
+from  pybricks.parameters import Port
 
 # Enable emulator mode if requested before importing anything that uses pybricks
 if os.environ.get("EV3_EMULATOR", "0") in ("1", "true", "True", "yes", "YES") and pathlib_exists:
