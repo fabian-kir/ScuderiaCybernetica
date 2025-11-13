@@ -33,6 +33,13 @@ class EmulatorUI:
 			with dpg.collapsing_header(label="Sensors", default_open=True, tag="sensors_header"):
 				dpg.add_text("Sensor Controls")
 				dpg.add_group(tag="sensors_container")
+			
+			dpg.add_separator()
+			
+			# Buttons section
+			with dpg.collapsing_header(label="EV3 Buttons", default_open=True, tag="buttons_header"):
+				dpg.add_text("Simulate Button Presses")
+				dpg.add_group(tag="buttons_container")
 		
 		# Configure window to fill viewport
 		dpg.set_primary_window("main_window", True)
@@ -82,6 +89,7 @@ class EmulatorUI:
 			self._refresh_motors()
 			self._refresh_motor_resistance_controls()
 			self._refresh_sensors()
+			self._refresh_buttons()
 		except Exception:
 			pass  # Ignore errors during refresh
 	
@@ -278,6 +286,143 @@ class EmulatorUI:
 					EMU_STATE.set_sensor(port, float(value))
 				except (ValueError, TypeError):
 					pass  # Ignore invalid values
+
+	def _refresh_buttons(self):
+		"""Update button display and controls."""
+		# Check if buttons UI already exists
+		if not dpg.does_item_exist("buttons_container"):
+			return
+		
+		# Check if buttons UI needs to be created
+		children = dpg.get_item_children("buttons_container", slot=1)
+		if children:
+			# Buttons UI already exists, just update button states
+			self._update_button_states()
+			return
+		
+		# Create button controls
+		button_names = ["LEFT", "RIGHT", "UP", "DOWN", "MIDDLE"]
+		button_labels = {
+			"LEFT": "← Left",
+			"RIGHT": "Right →",
+			"UP": "↑ Up",
+			"DOWN": "↓ Down",
+			"MIDDLE": "● Center"
+		}
+		
+		with dpg.group(horizontal=False, parent="buttons_container"):
+			dpg.add_text("Click buttons to simulate presses:", color=[200, 200, 200])
+			dpg.add_spacing(count=1)
+			
+			# Create a grid layout for buttons
+			with dpg.group(horizontal=True, parent="buttons_container"):
+				dpg.add_spacing(count=1)
+			with dpg.group(horizontal=True, parent="buttons_container"):
+				dpg.add_spacing(count=1)
+				# Up button
+				up_tag = "button_UP"
+				dpg.add_button(
+					label=button_labels["UP"],
+					tag=up_tag,
+					width=100,
+					height=50,
+					callback=self._make_button_callback("UP")
+				)
+				dpg.add_spacing(count=1)
+			
+			with dpg.group(horizontal=True, parent="buttons_container"):
+				# Left button
+				left_tag = "button_LEFT"
+				dpg.add_button(
+					label=button_labels["LEFT"],
+					tag=left_tag,
+					width=100,
+					height=50,
+					callback=self._make_button_callback("LEFT")
+				)
+				# Middle button
+				middle_tag = "button_MIDDLE"
+				dpg.add_button(
+					label=button_labels["MIDDLE"],
+					tag=middle_tag,
+					width=100,
+					height=50,
+					callback=self._make_button_callback("MIDDLE")
+				)
+				# Right button
+				right_tag = "button_RIGHT"
+				dpg.add_button(
+					label=button_labels["RIGHT"],
+					tag=right_tag,
+					width=100,
+					height=50,
+					callback=self._make_button_callback("RIGHT")
+				)
+			
+			with dpg.group(horizontal=True, parent="buttons_container"):
+				dpg.add_spacing(count=1)
+				# Down button
+				down_tag = "button_DOWN"
+				dpg.add_button(
+					label=button_labels["DOWN"],
+					tag=down_tag,
+					width=100,
+					height=50,
+					callback=self._make_button_callback("DOWN")
+				)
+				dpg.add_spacing(count=1)
+			
+			dpg.add_spacing(count=1)
+			dpg.add_text("Tip: Click to toggle button state", color=[150, 150, 150])
+		
+		# Set up button handlers for press/release (mouse down/up)
+		for button_name in button_names:
+			button_tag = f"button_{button_name}"
+			if dpg.does_item_exist(button_tag):
+				# Create handler registry for this button
+				handler_tag = f"button_handler_{button_name}"
+				with dpg.item_handler_registry(tag=handler_tag):
+					# Mouse down - press button
+					dpg.add_item_active_handler(
+						callback=self._make_button_active_callback(button_name, True)
+					)
+					# Mouse up - release button
+					dpg.add_item_deactivated_handler(
+						callback=self._make_button_active_callback(button_name, False)
+					)
+				dpg.bind_item_handler_registry(button_tag, handler_tag)
+		
+		# Update button visual states
+		self._update_button_states()
+
+	def _make_button_callback(self, button_name: str):
+		"""Create a callback function for button toggle."""
+		def callback(sender, app_data, user_data):
+			current_state = EMU_STATE.is_button_pressed(button_name)
+			EMU_STATE.set_button(button_name, not current_state)
+			self._update_button_states()
+		return callback
+
+	def _make_button_active_callback(self, button_name: str, pressed: bool):
+		"""Create a callback function for button press/release (mouse down/up)."""
+		def callback(sender, app_data, user_data):
+			EMU_STATE.set_button(button_name, pressed)
+			self._update_button_states()
+		return callback
+
+	def _update_button_states(self):
+		"""Update visual appearance of buttons based on their pressed state."""
+		button_names = ["LEFT", "RIGHT", "UP", "DOWN", "MIDDLE"]
+		for button_name in button_names:
+			button_tag = f"button_{button_name}"
+			if dpg.does_item_exist(button_tag):
+				is_pressed = EMU_STATE.is_button_pressed(button_name)
+				if is_pressed:
+					# Button is pressed - highlight it
+					dpg.configure_item(button_tag, color=[100, 200, 100])
+				else:
+					# Button is not pressed - normal appearance
+					dpg.configure_item(button_tag, color=[60, 60, 60])
 
 
 _ui_singleton = None

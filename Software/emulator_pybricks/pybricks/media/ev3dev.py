@@ -1,4 +1,8 @@
 class SoundFile:
 	CLICK = "CLICK"
+	SPEED_UP = "SPEED_UP"
+	SPEED_DOWN = "SPEED_DOWN"
+	BEEP = "BEEP"
+	CONFIRM = "CONFIRM"
 
 

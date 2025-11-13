@@ -6,6 +6,8 @@ from hardware.drive_motor import DriveMotor
 from hardware.ultrasonic_sensor import UltrasonicSensor
 from hardware.color_sensor import ColorSensor
 
+from controllers.plattform_controller import PlattformController
+
 from pybricks.tools import StopWatch, wait
 
 @singleton
@@ -18,12 +20,16 @@ class Controller:
         self.ultrasonic_sensor = UltrasonicSensor()
         self.color_sensor = ColorSensor()
 
-        self.to_update = [self.hub, self.plattform_motors, self.drive_motor, self.ultrasonic_sensor, self.color_sensor]
+        self.plattform_controller = PlattformController()
+
+        self.to_update = [self.hub, self.plattform_motors, self.drive_motor, self.ultrasonic_sensor, self.color_sensor, self.plattform_controller]
 
         self.running = False
 
     def run(self):
         """Main control loop with delta timing using Pybricks StopWatch."""
+        RobotHub().play_startup_sound()
+
         # Values for testing
         self.drive_motor.drive(10)
         self.plattform_motors.move_plattform(d_angle_x=10, d_angle_y=10, speed_x=2, speed_y=2)

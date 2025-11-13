@@ -11,11 +11,21 @@ class ColorSensor:
         self.port = PORTS["COLOR_SENSOR"]
         self.sensor = PybricksColorSensor(self.port)
 
+        self.target_reflection = 0.0
+
         RobotHub().print("Set up color sensor on port:", self.port)
 
     def update(self, dt):
-        # TODO
-        RobotHub().print("color sensor update not implemented yet")
+        pass
 
-    def get_reflection(self):
+    def get_reflection_error(self):
+        """Returns the difference between the current reflection and the target."""
+        return self.target_reflection - self.sensor.reflection()
+
+    def get_absolute_reflection(self):
         return self.sensor.reflection()
+
+    def calibrate_to_current_state(self):
+        self.target_reflection = self.get_reflection()
+
+        RobotHub().print("Calibrated color sensor to current state.")

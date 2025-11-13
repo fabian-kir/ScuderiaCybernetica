@@ -28,12 +28,22 @@ class RobotHub:
         """Make a simple beep."""
         self.hub.speaker.beep()
 
+    def play_startup_sound(self):
+        self.hub.speaker.play_file(SoundFile.SPEED_UP)
+
     def set_led(self, color):
         """Change LED color."""
         self.hub.light.on(color)
 
-    def await_user_confirmation(self, play_button_respond_sound = True):
+    def await_user_confirmation(self, message="", play_user_prompt_sound=True, play_button_respond_sound=True):
         """Wait for user to press and release middle button."""
+
+        if message:
+            self.hub.screen.clear()
+            self.hub.screen.draw_text(20, 20, message)
+
+        if play_user_prompt_sound:
+            self.hub.speaker.play_file(SoundFile.CONFIRM)
 
         # wait for middle button to be pressed
         while True:
