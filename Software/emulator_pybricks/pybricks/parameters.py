@@ -17,7 +17,7 @@ class Button(Enum):
 	RIGHT = "RIGHT"
 	UP = "UP"
 	DOWN = "DOWN"
-	CENTER = "MIDDLE"
+	CENTER = "CENTER"
 	MIDDLE = "MIDDLE"
 
 
