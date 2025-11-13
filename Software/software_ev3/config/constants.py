@@ -6,7 +6,7 @@ CONSTANTS = {
     "DEFAULT_SPEED_BALANCE_X": 50,
     "DEFAULT_SPEED_BALANCE_Y": 50,
     "X_DISTANCE_AXLE_SLEDS": 500, # in mm
-    "POWER_PER_SPEED": 30, # this is the best estimate for d (dc) / d s (for dc is power output and s is speed in mm/s)
+    "POWER_PER_SPEED": .5, # this is the best estimate for d (dc) / d s (for dc is power output and s is speed in mm/s)
     
     # PI speed controller gains for drive motor
     # KP: proportional gain (power per speed error in deg/s)

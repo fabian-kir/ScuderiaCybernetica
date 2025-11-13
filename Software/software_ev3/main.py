@@ -1,12 +1,16 @@
 #!/usr/bin/env pybricks-micropython
 import os
 import sys
-from pathlib import Path
+pathlib_exists = True
+try:
+	from pathlib import Path
+except ImportError:
+	pathlib_exists = False
 
 from Software.emulator_pybricks.pybricks.parameters import Port
 
 # Enable emulator mode if requested before importing anything that uses pybricks
-if os.environ.get("EV3_EMULATOR", "0") in ("1", "true", "True", "yes", "YES"):
+if os.environ.get("EV3_EMULATOR", "0") in ("1", "true", "True", "yes", "YES") and pathlib_exists:
 	# Add the emulator pybricks shim to sys.path so `import pybricks` resolves to our emulator
 	this_file = Path(__file__).resolve()
 	software_root = this_file.parent.parent
