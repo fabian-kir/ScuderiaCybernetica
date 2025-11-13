@@ -36,7 +36,7 @@ class RobotHub:
         self.hub.light.on(color)
 
     def await_user_confirmation(self, message="", play_user_prompt_sound=True, play_button_respond_sound=True):
-        """Wait for user to press and release middle button."""
+        """Wait for user to press and release CENTER button."""
 
         if message:
             self.hub.screen.clear()
@@ -45,14 +45,14 @@ class RobotHub:
         if play_user_prompt_sound:
             self.hub.speaker.play_file(SoundFile.CONFIRM)
 
-        # wait for middle button to be pressed
+        # wait for CENTER button to be pressed
         while True:
-            if Button.MIDDLE in self.hub.buttons.pressed():
+            if Button.CENTER in self.hub.buttons.pressed():
                 break
 
-        # wait for middle button to be released again
+        # wait for CENTER button to be released again
         while True:
-            if Button.MIDDLE not in self.hub.buttons.pressed():
+            if Button.CENTER not in self.hub.buttons.pressed():
                 break
 
         if play_button_respond_sound:
