@@ -106,7 +106,7 @@ class DriveMotor:
         # PID Controller
         # Proportional term
         proportional = CONSTANTS["DRIVE_SPEED_KP"] * speed_error
-        
+        '''
         # Integral term (with anti-windup)
         self._integral_error += speed_error * dt
         # Limit integral to prevent windup: clamp to [-max_integral, max_integral]
@@ -118,10 +118,10 @@ class DriveMotor:
         error_derivative = (speed_error - self._previous_error) / dt if dt > 0.0 else 0.0
         # Use KD if available, otherwise 0
         kd = CONSTANTS.get("DRIVE_SPEED_KD", 0.0)
-        derivative = kd * error_derivative
+        derivative = kd * error_derivative'''
         
         # Calculate total power output
-        self.power = proportional + integral + derivative
+        self.power = proportional #+ integral + derivative
         
         # Clamp power to valid range [-100, 100]
         self.power = max(-100, min(100, self.power))

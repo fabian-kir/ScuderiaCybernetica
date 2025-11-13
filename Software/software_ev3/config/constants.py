@@ -11,7 +11,7 @@ CONSTANTS = {
     # ============================================================================
     # Gear ratios for balance platform motors
     # Applied to angle commands: actual_motor_angle = command_angle * gear_ratio
-    "GEAR_RATIO_BALANCE_X": 1/1,  # Gear ratio for X-axis balance motor
+    "GEAR_RATIO_BALANCE_X": -3,  # Gear ratio for X-axis balance motor
     "GEAR_RATIO_BALANCE_Y": 1/1,  # Gear ratio for Y-axis balance motor
     
     # Default speeds for balance platform motors (deg/s)
@@ -27,7 +27,7 @@ CONSTANTS = {
     # Higher values = faster response but may cause overshoot/oscillation
     # Units: degrees per reflection error unit
     # Typical range: 0.1 - 1.0
-    "PLATFORM_COLOR_KP": 0.3,
+    "PLATFORM_COLOR_KP": 2,
     
     # Integral gain: angle correction per unit of reflection error per second
     # Eliminates steady-state error but can cause windup if too high
@@ -64,12 +64,12 @@ CONSTANTS = {
     # Prevents sudden movements that could impart impulse to objects on platform
     # Lower values = smoother but slower response
     # Higher values = faster response but risk of impulse
-    "PLATFORM_MAX_SPEED_X": 20,  # Maximum speed for X-axis corrections
-    "PLATFORM_MAX_SPEED_Y": 20,  # Maximum speed for Y-axis corrections
+    "PLATFORM_MAX_SPEED_X": 100,  # Maximum speed for X-axis corrections
+    "PLATFORM_MAX_SPEED_Y": 50,  # Maximum speed for Y-axis corrections
     
     # Maximum angle correction per update cycle (degrees)
     # Additional safety limit to prevent large corrections in single step
-    "PLATFORM_MAX_ANGLE_CORRECTION_X": 2.0,  # Maximum angle correction for X-axis per update
+    "PLATFORM_MAX_ANGLE_CORRECTION_X": 10,  # Maximum angle correction for X-axis per update
     "PLATFORM_MAX_ANGLE_CORRECTION_Y": 2.0,  # Maximum angle correction for Y-axis per update
     
     # Integral windup prevention limits
@@ -83,12 +83,12 @@ CONSTANTS = {
     # Proportional gain: power output per speed error (deg/s)
     # Higher values = faster response but may cause overshoot/oscillation
     # Typical range: 0.5 - 2.0
-    "DRIVE_SPEED_KP": 1.0,
+    "DRIVE_SPEED_KP": 0.1,
     
     # Integral gain: power output per speed error per second
     # Eliminates steady-state error but can cause windup if too high
     # Typical range: 0.1 - 0.5
-    "DRIVE_SPEED_KI": 0.2,
+    "DRIVE_SPEED_KI": 0.1,
     
     # ============================================================================
     # Drive Motor Speed Filtering

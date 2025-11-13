@@ -20,8 +20,8 @@ class PlattformMotors:
     
     def __init__(self):
         """Initialize platform motors with configuration from constants."""
-        self.port_x = PORTS["SMALL_BALANCE_MOTOR"]
-        self.port_y = PORTS["LARGE_BALANCE_MOTOR"]
+        self.port_x = PORTS["LARGE_BALANCE_MOTOR"]
+        self.port_y = PORTS["SMALL_BALANCE_MOTOR"]
 
         # Gear ratios applied to angle commands
         # actual_motor_angle = command_angle * gear_ratio

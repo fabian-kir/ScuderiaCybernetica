@@ -11,7 +11,7 @@ class ColorSensor:
         self.port = PORTS["COLOR_SENSOR"]
         self.sensor = PybricksColorSensor(self.port)
 
-        self.target_reflection = 0.0
+        self.target_reflection = 0
 
         RobotHub().print("Set up color sensor on port:", self.port)
 
