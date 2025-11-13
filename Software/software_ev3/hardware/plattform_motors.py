@@ -94,3 +94,6 @@ class PlattformMotors:
         """
         self.motor_x.hold()
         self.motor_y.hold()
+
+    def get_angles(self):
+        return self.motor_x.angle(), self.motor_y.angle()

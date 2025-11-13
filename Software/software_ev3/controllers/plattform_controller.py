@@ -46,7 +46,7 @@ class PlattformController:
         
         # Integral term: accumulates error over time to eliminate steady-state error
         # Prevents integral windup by clamping the accumulated value
-        '''self.color_integral += error * dt
+        self.color_integral += error * dt
         max_integral = CONSTANTS["PLATFORM_MAX_INTEGRAL_X"]
         self.color_integral = max(-max_integral, min(max_integral, self.color_integral))
         i_term = CONSTANTS["PLATFORM_COLOR_KI"] * self.color_integral
@@ -54,23 +54,27 @@ class PlattformController:
         # Derivative term: responds to rate of change of error (dampens oscillations)
         error_rate = (error - self.color_previous_error) / dt if dt > 0 else 0.0
         d_term = CONSTANTS["PLATFORM_COLOR_KD"] * error_rate
-        self.color_previous_error = error'''
+        self.color_previous_error = error
         
         # Calculate total angle correction
-        angle_correction = p_term #+ i_term + d_term
+        angle_correction = p_term + i_term + d_term
         
         # Limit angle correction per update to prevent sudden movements
         max_correction = CONSTANTS["PLATFORM_MAX_ANGLE_CORRECTION_X"]
-        #angle_correction = max(-max_correction, min(max_correction, angle_correction))
+        angle_correction = max(-max_correction, min(max_correction, angle_correction))
         
         # Only move if correction is significant (avoid jitter from noise)
-        if abs(angle_correction) > 0.1:
+        if abs(angle_correction) > CONSTANTS["CORRECTION_ERROR_TRESHOLD"]:
             # Limit speed to prevent impulse
             max_speed = CONSTANTS["PLATFORM_MAX_SPEED_X"]
             self.plattform_motors.move_plattform(
                 d_angle_x=angle_correction,
                 speed_x=max_speed
             )
+
+        RobotHub().print("Color Sensor Relative Value:", self.color_sensor.get_reflection_error())
+        RobotHub().print("Motor Angle Current:", self.plattform_motors.get_angles())
+    
     '''
     def pid_from_ultrasonic_sensor(self, dt):
         """
