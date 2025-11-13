@@ -32,7 +32,6 @@ class Controller:
 
         # Values for testing
         self.drive_motor.drive(10)
-        self.plattform_motors.move_plattform(d_angle_x=10, d_angle_y=10, speed_x=2, speed_y=2)
 
         # Main Loop
         self.running = True
