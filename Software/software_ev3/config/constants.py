@@ -12,7 +12,7 @@ CONSTANTS = {
     # Gear ratios for balance platform motors
     # Applied to angle commands: actual_motor_angle = command_angle * gear_ratio
     "GEAR_RATIO_BALANCE_X": 1/1,  # Gear ratio for X-axis balance motor
-    "GEAR_RATIO_BALANCE_Y": 1/1,  # Gear ratio for Y-axis balance motor
+    "GEAR_RATIO_BALANCE_Y": -3,  # Gear ratio for Y-axis balance motor
     
     # Default speeds for balance platform motors (deg/s)
     # Used when no speed is explicitly specified in move_plattform()
