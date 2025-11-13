@@ -31,7 +31,7 @@ class Controller:
         RobotHub().play_startup_sound()
 
         # Values for testing
-        self.drive_motor.drive(10)
+        self.drive_motor.drive(500)
 
         # Main Loop
         self.running = True

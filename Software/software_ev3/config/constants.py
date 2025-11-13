@@ -64,8 +64,8 @@ CONSTANTS = {
     # Prevents sudden movements that could impart impulse to objects on platform
     # Lower values = smoother but slower response
     # Higher values = faster response but risk of impulse
-    "PLATFORM_MAX_SPEED_X": 20,  # Maximum speed for X-axis corrections
-    "PLATFORM_MAX_SPEED_Y": 20,  # Maximum speed for Y-axis corrections
+    "PLATFORM_MAX_SPEED_X": 100,  # Maximum speed for X-axis corrections
+    "PLATFORM_MAX_SPEED_Y": 100,  # Maximum speed for Y-axis corrections
     
     # Maximum angle correction per update cycle (degrees)
     # Additional safety limit to prevent large corrections in single step
@@ -83,7 +83,7 @@ CONSTANTS = {
     # Proportional gain: power output per speed error (deg/s)
     # Higher values = faster response but may cause overshoot/oscillation
     # Typical range: 0.5 - 2.0
-    "DRIVE_SPEED_KP": 1.0,
+    "DRIVE_SPEED_KP": .1,
     
     # Integral gain: power output per speed error per second
     # Eliminates steady-state error but can cause windup if too high
