@@ -16,7 +16,7 @@ class UltrasonicSensor:
         RobotHub().print("Set up ultrasonic sensor on port:", self.port)
 
     def calibrate_to_current_state(self):
-        self.target_distance = self.get_distance()
+        self.target_distance = self.get_absolute_distance()
         RobotHub().print("Calibrated ultrasonic sensor to current state.")
 
     def update(self, dt):
