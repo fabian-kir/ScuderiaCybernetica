@@ -13,7 +13,11 @@ except ImportError:
 # Also check if EV3_EMULATOR is explicitly set
 env_emulator = os.environ.get("EV3_EMULATOR", "0") in ("1", "true", "True", "yes", "YES")
 # Auto-detect: if pathlib exists (not MicroPython) and not on actual EV3 hardware
-is_ev3_hardware = sys.platform == "linux" and os.path.exists("/sys/class/lego-port")
+try:
+	is_ev3_hardware = sys.platform == "linux" and os.path.exists("/sys/class/lego-port")
+except AttributeError:
+	is_ev3_hardware = False
+
 should_use_emulator = env_emulator or (pathlib_exists and not is_ev3_hardware)
 
 # Enable emulator mode if requested before importing anything that uses pybricks
@@ -26,7 +30,6 @@ if should_use_emulator and pathlib_exists:
 	# Add both paths, with emulator taking priority
 	if str(emulator_root) not in sys.path:
 		sys.path.insert(0, str(emulator_root))
-	print(f"EV3 Emulator enabled (EV3_EMULATOR={os.environ.get('EV3_EMULATOR', 'auto')})")
 
 import pybricks.robotics
 
