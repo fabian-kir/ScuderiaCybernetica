@@ -82,39 +82,29 @@ CONSTANTS = {
     # ============================================================================
     # Drive Motor PID Controller Configuration
     # ============================================================================
-    # Proportional gain: power output per speed error (deg/s)
+    # Proportional gain: power output per speed error
     # Higher values = faster response but may cause overshoot/oscillation
-    # Typical range: 0.5 - 2.0
     "DRIVE_SPEED_KP": 0.1,
     
     # Integral gain: power output per speed error per second
     # Eliminates steady-state error but can cause windup if too high
-    # Typical range: 0.1 - 0.5
     "DRIVE_SPEED_KI": 0.1,
-    
-    # ============================================================================
-    # Drive Motor Speed Filtering
-    # ============================================================================
-    # First-order IIR filter coefficient for speed noise reduction
-    # Range: 0.0 (maximum filtering, slow response) to 1.0 (no filtering, fast response)
-    # Formula: filtered_speed = alpha * raw_speed + (1 - alpha) * previous_filtered_speed
-    # Typical range: 0.2 - 0.5
-    "SPEED_FILTER_ALPHA": 0.3,
-    
-    # ============================================================================
-    # Drive Motor Slope/Resistance Compensation
-    # ============================================================================
-    # Reference resistance value representing flat ground conditions
-    # Used as baseline for detecting uphill/downhill slopes
-    # Units: torque_per_power ratio (dimensionless)
-    "BASE_RESISTANCE": 2.0,
+
+    # Derivative gain:
+    "DRIVE_SPEED_KD": 0.1,
+
+    """
+    K_p 0.1 → 10 Start small; increase until system responds quickly but doesn’t overshoot too much.
+    K_i 0.01 → 1 Usually smaller than K_p; increase slowly to remove steady-state error.
+    K_d 0 → 1 Typically smallest; helps stabilize oscillations. Start with 0 and add only if needed.
+    """
     
     # Speed compensation factor for slope compensation
     # How much to increase target speed per unit of resistance increase
-    # Formula: adjusted_target_speed = base_target_speed + 
-    #          (resistance - BASE_RESISTANCE) * SPEED_COMPENSATION_PER_RESISTANCE
     # Higher resistance (uphill) = higher target speed to maintain constant velocity
     # Units: deg/s per resistance unit
     # Typical range: 10.0 - 30.0
     "SPEED_COMPENSATION_PER_RESISTANCE": 20.0,
+    "DRIVE_MOTOR_BASE_RESISTANCE": .0001, # the resistance the drive motor experiences when just going straight
+                                          # and not uphill - needs to be adjusted when robots weight changes
 }
