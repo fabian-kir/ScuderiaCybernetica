@@ -43,7 +43,7 @@ class Controller:
         RobotHub().play_startup_sound()
 
         # Values for testing
-        self.drive_motor.drive(0)
+        self.drive_motor.drive(100)
 
         # Main Loop
         self.running = True
@@ -55,6 +55,10 @@ class Controller:
                 now_ms = sw.time()
                 dt = (now_ms - last_ms) / 1000.0  # convert to seconds
                 last_ms = now_ms
+
+                if dt < .001:
+                    RobotHub().print("WARNING: dt is too small:", dt, "adjusting to .001")
+                    dt = .001
 
                 self.update(dt)
                 

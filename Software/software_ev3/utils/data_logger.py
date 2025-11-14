@@ -6,7 +6,11 @@ Data is saved in CSV format for easy parsing and plotting later.
 """
 
 from time import time
+
+from pybricks.tools import StopWatch
 from utils.singleton import singleton
+
+from Software.software_ev3.hardware.robot_hub import RobotHub
 
 
 @singleton
@@ -16,7 +20,7 @@ class DataLogger:
 
     Usage:
         logger = DataLogger()
-        logger.log_data(stream_name="motor_speed", dt=0.01, value=45.5)
+        logger.log_data(stream_name="motor_speed", value=45.5)
     """
 
     def __init__(self, log_file="robot_data.csv", enabled=True):
@@ -27,9 +31,11 @@ class DataLogger:
             log_file: Path to the log file (default: "robot_data.csv")
             enabled: Whether logging is enabled (default: True)
         """
+        self.stop_watch = StopWatch()
+
         self.log_file = log_file
         self.enabled = enabled
-        self.start_time = time()
+        self.start_time = self.stop_watch.time()
         self._file_handle = None
         self._file_initialized = False
         self._ensure_file_initialized()
@@ -41,7 +47,7 @@ class DataLogger:
             f.close()
             return True
         except OSError:
-            return False
+            RobotHub().print("OS Error when trying to initialize log file")
 
     def _format_csv_row(self, values):
         """
@@ -77,25 +83,27 @@ class DataLogger:
             
             # Write header if file is new
             if file_needs_header:
-                header = self._format_csv_row(['timestamp', 'elapsed_time', 'stream_name', 'dt', 'value'])
+                header = self._format_csv_row(['stream_name', 'time', 'value'])
                 self._file_handle.write(header + '\n')
                 self._file_handle.flush()
             
             self._file_initialized = True
         except Exception:
+            RobotHub().print("Error opening log file:", self.log_file)
             # Silently fail to avoid disrupting robot operation
             self._file_handle = None
             self._file_initialized = False
 
-    def log_data(self, stream_name, dt, value):
+    def log_data(self, stream_name, value):
         """
         Log a data point.
 
         Args:
             stream_name: Name of the data stream (e.g., "motor_speed", "angle")
-            dt: Time delta in seconds since last update
             value: The value to log (can be int or float)
         """
+        time = self.stop_watch.time()
+
         if not self.enabled:
             return
 
@@ -103,18 +111,15 @@ class DataLogger:
         if not self._file_initialized or self._file_handle is None:
             self._ensure_file_initialized()
             if not self._file_initialized:
+                RobotHub().print("Error re-initializing log file")
                 return
 
         try:
-            current_time = time()
-            elapsed_time = current_time - self.start_time
 
-            # Format and write data row: timestamp, elapsed_time, stream_name, dt, value
+            # Format and write data row: stream_name, time, value
             row = self._format_csv_row([
-                current_time,
-                elapsed_time,
                 stream_name,
-                dt,
+                time,
                 value
             ])
             self._file_handle.write(row + '\n')
@@ -123,6 +128,7 @@ class DataLogger:
         except Exception:
             # Silently fail to avoid disrupting robot operation
             # Close file handle so it can be re-opened next time
+            RobotHub().print("Error logging data to file")
             if self._file_handle:
                 try:
                     self._file_handle.close()
@@ -162,7 +168,7 @@ class DataLogger:
 _logger_instance = None
 
 
-def log_data(stream_name, dt, value):
+def log_data(stream_name, value):
     """
     Convenience function to log data without needing to get the logger instance.
 
@@ -178,5 +184,5 @@ def log_data(stream_name, dt, value):
     global _logger_instance
     if _logger_instance is None:
         _logger_instance = DataLogger()
-    _logger_instance.log_data(stream_name, dt, value)
+    _logger_instance.log_data(stream_name, value)
 

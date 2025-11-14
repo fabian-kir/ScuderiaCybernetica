@@ -2,6 +2,7 @@ from config.ports import PORTS
 from pybricks.ev3devices import UltrasonicSensor as PybricksUltrasonicSensor
 
 from utils.singleton import singleton
+from utils.data_logger import log_data
 from hardware.robot_hub import RobotHub
 
 
@@ -20,7 +21,7 @@ class UltrasonicSensor:
         RobotHub().print("Calibrated ultrasonic sensor to current state.")
 
     def update(self, dt):
-        pass
+        log_data("ultrasonic_sensor", self.sensor.distance())
 
     def get_distance_error(self):
         """Returns the difference between the current distance and the target."""

@@ -40,19 +40,49 @@ def load_data(filename):
     Load data from CSV file.
 
     Returns:
-        dict: Dictionary mapping stream_name to list of (elapsed_time, dt, value) tuples
+        dict: Dictionary mapping stream_name to list of (time, value) tuples
     """
     data = defaultdict(list)
 
     with open(filename, 'r') as f:
         reader = csv.DictReader(f)
-        for row in reader:
-            stream_name = row['stream_name']
-            elapsed_time = float(row['elapsed_time'])
-            dt = float(row['dt'])
-            value = float(row['value'])
-            data[stream_name].append((elapsed_time, dt, value))
-
+        
+        # Check if we have the old format or new format
+        fieldnames = reader.fieldnames
+        print(f"DEBUG: CSV fieldnames: {fieldnames}")
+        
+        for i, row in enumerate(reader):
+            if i == 0:  # Debug first row
+                print(f"DEBUG: First row: {row}")
+            
+            # Handle both old format and new format
+            if 'stream_name' in fieldnames and 'value' in fieldnames:
+                stream_name = row['stream_name']
+                
+                # Handle time column - try both 'time' and 'elapsed_time'
+                try:
+                    if 'time' in fieldnames:
+                        time = float(row['time'])
+                    elif 'elapsed_time' in fieldnames:
+                        time = float(row['elapsed_time'])
+                    else:
+                        raise KeyError("Neither 'time' nor 'elapsed_time' column found in CSV file")
+                except ValueError as e:
+                    print(f"DEBUG: Error converting time to float: {e}")
+                    print(f"DEBUG: Row {i}: {row}")
+                    raise e
+                
+                try:
+                    value = float(row['value'])
+                except ValueError as e:
+                    print(f"DEBUG: Error converting value to float: {e}")
+                    print(f"DEBUG: Row {i}: {row}")
+                    raise e
+                
+                data[stream_name].append((time, value))
+            else:
+                raise KeyError("Required columns 'stream_name' and 'value' not found in CSV file")
+                
     return data
 
 
@@ -78,8 +108,8 @@ def plot_with_matplotlib(data, filename):
 
     for idx, stream_name in enumerate(streams):
         stream_data = data[stream_name]
-        times = [t for t, _, _ in stream_data]
-        values = [v for _, _, v in stream_data]
+        times = [t for t, _ in stream_data]
+        values = [v for _, v in stream_data]
 
         axes[idx].plot(times, values, linewidth=1.5)
         axes[idx].set_xlabel('Elapsed Time (s)')
@@ -115,8 +145,8 @@ def plot_with_plotly(data, filename):
 
     for idx, stream_name in enumerate(streams):
         stream_data = data[stream_name]
-        times = [t for t, _, _ in stream_data]
-        values = [v for _, _, v in stream_data]
+        times = [t for t, _ in stream_data]
+        values = [v for _, v in stream_data]
 
         fig.add_trace(
             go.Scatter(

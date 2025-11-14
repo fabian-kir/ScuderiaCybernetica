@@ -16,7 +16,7 @@ class ColorSensor:
         RobotHub().print("Set up color sensor on port:", self.port)
 
     def update(self, dt):
-        log_data("color_sensor", dt, self.sensor.reflection())
+        log_data("color_sensor", self.sensor.reflection())
 
     def get_reflection_error(self):
         """Returns the difference between the current reflection and the target."""

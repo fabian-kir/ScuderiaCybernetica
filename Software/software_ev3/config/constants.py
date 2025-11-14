@@ -84,7 +84,7 @@ CONSTANTS = {
     # ============================================================================
     # Proportional gain: power output per speed error
     # Higher values = faster response but may cause overshoot/oscillation
-    "DRIVE_SPEED_KP": 0.1,
+    "DRIVE_SPEED_KP": .1,
     
     # Integral gain: power output per speed error per second
     # Eliminates steady-state error but can cause windup if too high

@@ -72,9 +72,7 @@ class PlattformController:
                 speed_x=max_speed
             )
 
-        RobotHub().print("Color Sensor Relative Value:", self.color_sensor.get_reflection_error())
-        RobotHub().print("Motor Angle Current:", self.plattform_motors.get_angles())
-    
+
     '''
     def pid_from_ultrasonic_sensor(self, dt):
         """

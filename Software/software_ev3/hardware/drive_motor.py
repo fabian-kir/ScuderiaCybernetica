@@ -43,8 +43,8 @@ class DriveMotor:
         self.target_speed = speed
 
     def update(self, dt):
-        log_data("drive_motor_speed", dt, self.motor.speed())
-        log_data("drive_motor_power", dt, self.get_power())
+        log_data("drive_motor_speed", self.motor.speed())
+        log_data("drive_motor_power", self.get_power())
 
         self._pid_controller(dt)
         self._update_resistance()
@@ -74,6 +74,10 @@ class DriveMotor:
         return sum(self.past_resistances[-n:]) / n if len(self.past_resistances) >= n else 0.0
 
     def _update_resistance(self):
+        if self.get_power() == 0:
+            self.past_resistances = [self.base_resistance] * 10
+            return
+
         '''Adds a new resistance measurement to the past measurements.'''
         resistance = self.motor.speed() / self.get_power() # in (rad / s) / V
         self.past_resistances.append(resistance)
