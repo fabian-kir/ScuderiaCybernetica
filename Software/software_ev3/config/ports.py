@@ -5,5 +5,5 @@ PORTS = {
     "SMALL_BALANCE_MOTOR": Port.C,
     "LARGE_BALANCE_MOTOR": Port.B,
     "COLOR_SENSOR": Port.S1,
-    "ULTRASONIC_SENSOR": Port.S2
+    "ULTRASONIC_SENSOR": Port.S3
 }

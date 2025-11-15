@@ -1,232 +1,42 @@
 #!/usr/bin/env python3
-"""
-Interactive plotting tool for robot data logs.
-
-This script reads CSV files created by DataLogger and creates interactive plots.
-Requires matplotlib and optionally plotly for better interactivity.
-
-Usage:
-    python plot_data.py [log_file.csv]
-
-If no file is specified, defaults to "robot_data.csv"
-"""
-
-import sys
-import csv
 import argparse
-from collections import defaultdict
+import pandas as pd
+import plotly.graph_objects as go
 
-try:
-    import matplotlib.pyplot as plt
-    import matplotlib
+def main():
+    parser = argparse.ArgumentParser(description="Plot robot data CSV using Plotly.")
+    parser.add_argument("file", help="Path to robot_data.csv")
+    args = parser.parse_args()
 
-    HAS_MATPLOTLIB = True
-except ImportError:
-    HAS_MATPLOTLIB = False
-    print("Warning: matplotlib not found. Install with: pip install matplotlib")
+    # Load CSV with no header
+    df = pd.read_csv(args.file, header=None, names=["stream", "timestamp", "value"])
 
-try:
-    import plotly.graph_objects as go
-    from plotly.subplots import make_subplots
+    # Convert timestamps to numeric
+    df["timestamp"] = pd.to_numeric(df["timestamp"], errors="coerce")
+    df["value"] = pd.to_numeric(df["value"], errors="coerce")
 
-    HAS_PLOTLY = True
-except ImportError:
-    HAS_PLOTLY = False
-    print("Info: plotly not found. Install with: pip install plotly for interactive plots")
+    # Build figure
+    fig = go.Figure()
 
-
-def load_data(filename):
-    """
-    Load data from CSV file.
-
-    Returns:
-        dict: Dictionary mapping stream_name to list of (time, value) tuples
-    """
-    data = defaultdict(list)
-
-    with open(filename, 'r') as f:
-        reader = csv.DictReader(f)
-        
-        # Check if we have the old format or new format
-        fieldnames = reader.fieldnames
-        print(f"DEBUG: CSV fieldnames: {fieldnames}")
-        
-        for i, row in enumerate(reader):
-            if i == 0:  # Debug first row
-                print(f"DEBUG: First row: {row}")
-            
-            # Handle both old format and new format
-            if 'stream_name' in fieldnames and 'value' in fieldnames:
-                stream_name = row['stream_name']
-                
-                # Handle time column - try both 'time' and 'elapsed_time'
-                try:
-                    if 'time' in fieldnames:
-                        time = float(row['time'])
-                    elif 'elapsed_time' in fieldnames:
-                        time = float(row['elapsed_time'])
-                    else:
-                        raise KeyError("Neither 'time' nor 'elapsed_time' column found in CSV file")
-                except ValueError as e:
-                    print(f"DEBUG: Error converting time to float: {e}")
-                    print(f"DEBUG: Row {i}: {row}")
-                    raise e
-                
-                try:
-                    value = float(row['value'])
-                except ValueError as e:
-                    print(f"DEBUG: Error converting value to float: {e}")
-                    print(f"DEBUG: Row {i}: {row}")
-                    raise e
-                
-                data[stream_name].append((time, value))
-            else:
-                raise KeyError("Required columns 'stream_name' and 'value' not found in CSV file")
-                
-    return data
-
-
-def plot_with_matplotlib(data, filename):
-    """Create plots using matplotlib."""
-    if not HAS_MATPLOTLIB:
-        print("Error: matplotlib is required for plotting")
-        return
-
-    streams = sorted(data.keys())
-    num_streams = len(streams)
-
-    if num_streams == 0:
-        print("No data streams found in file")
-        return
-
-    # Create subplots
-    fig, axes = plt.subplots(num_streams, 1, figsize=(12, 4 * num_streams))
-    if num_streams == 1:
-        axes = [axes]
-
-    fig.suptitle(f'Robot Data Log: {filename}', fontsize=14, fontweight='bold')
-
-    for idx, stream_name in enumerate(streams):
-        stream_data = data[stream_name]
-        times = [t for t, _ in stream_data]
-        values = [v for _, v in stream_data]
-
-        axes[idx].plot(times, values, linewidth=1.5)
-        axes[idx].set_xlabel('Elapsed Time (s)')
-        axes[idx].set_ylabel('Value')
-        axes[idx].set_title(f'Stream: {stream_name}')
-        axes[idx].grid(True, alpha=0.3)
-
-    plt.tight_layout()
-    plt.show()
-
-
-def plot_with_plotly(data, filename):
-    """Create interactive plots using plotly."""
-    if not HAS_PLOTLY:
-        print("Error: plotly is required for interactive plotting")
-        return
-
-    streams = sorted(data.keys())
-    num_streams = len(streams)
-
-    if num_streams == 0:
-        print("No data streams found in file")
-        return
-
-    # Create subplots
-    fig = make_subplots(
-        rows=num_streams,
-        cols=1,
-        subplot_titles=[f'Stream: {name}' for name in streams],
-        vertical_spacing=0.1,
-        shared_xaxes=True
-    )
-
-    for idx, stream_name in enumerate(streams):
-        stream_data = data[stream_name]
-        times = [t for t, _ in stream_data]
-        values = [v for _, v in stream_data]
-
+    # Create one trace per stream
+    for stream_name, group in df.groupby("stream"):
         fig.add_trace(
             go.Scatter(
-                x=times,
-                y=values,
-                mode='lines',
-                name=stream_name,
-                line=dict(width=2)
-            ),
-            row=idx + 1,
-            col=1
+                x=group["timestamp"],
+                y=group["value"],
+                mode="lines+markers",
+                name=stream_name
+            )
         )
 
     fig.update_layout(
-        title_text=f'Robot Data Log: {filename}',
-        title_x=0.5,
-        height=300 * num_streams,
-        showlegend=True
+        title="Robot Telemetry Data",
+        xaxis_title="Timestamp",
+        yaxis_title="Value",
+        hovermode="closest"
     )
-
-    # Update x-axis labels
-    for idx in range(num_streams):
-        fig.update_xaxes(title_text='Elapsed Time (s)', row=idx + 1, col=1)
-        fig.update_yaxes(title_text='Value', row=idx + 1, col=1)
 
     fig.show()
 
-
-def main():
-    parser = argparse.ArgumentParser(
-        description='Plot robot data logs interactively'
-    )
-    parser.add_argument(
-        'log_file',
-        nargs='?',
-        default='../robot_data.csv',
-        help='Path to the CSV log file (default: robot_data.csv)'
-    )
-    parser.add_argument(
-        '--backend',
-        choices=['matplotlib', 'plotly', 'auto'],
-        default='auto',
-        help='Plotting backend to use (default: auto - uses plotly if available, else matplotlib)'
-    )
-
-    args = parser.parse_args()
-
-    # Load data
-    try:
-        data = load_data(args.log_file)
-    except FileNotFoundError:
-        print(f"Error: File '{args.log_file}' not found")
-        sys.exit(1)
-    except Exception as e:
-        print(f"Error loading data: {e}")
-        sys.exit(1)
-
-    if not data:
-        print("No data found in file")
-        sys.exit(1)
-
-    print(f"Loaded {len(data)} data stream(s): {', '.join(sorted(data.keys()))}")
-    for stream_name, stream_data in data.items():
-        print(f"  {stream_name}: {len(stream_data)} data points")
-
-    # Choose plotting backend
-    backend = args.backend
-    if backend == 'auto':
-        backend = 'plotly' if HAS_PLOTLY else 'matplotlib'
-
-    # Create plots
-    if backend == 'plotly' and HAS_PLOTLY:
-        print("\nCreating interactive plot with plotly...")
-        plot_with_plotly(data, args.log_file)
-    elif backend == 'matplotlib' and HAS_MATPLOTLIB:
-        print("\nCreating plot with matplotlib...")
-        plot_with_matplotlib(data, args.log_file)
-    else:
-        print("Error: No plotting library available. Install matplotlib or plotly.")
-        sys.exit(1)
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

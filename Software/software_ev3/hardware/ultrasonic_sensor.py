@@ -1,5 +1,6 @@
 from config.ports import PORTS
 from pybricks.ev3devices import UltrasonicSensor as PybricksUltrasonicSensor
+from pybricks.ev3devices import InfraredSensor
 
 from utils.singleton import singleton
 from utils.data_logger import log_data
@@ -10,7 +11,8 @@ from hardware.robot_hub import RobotHub
 class UltrasonicSensor:
     def __init__(self):
         self.port = PORTS["ULTRASONIC_SENSOR"]
-        self.sensor = PybricksUltrasonicSensor(self.port)
+        # self.sensor = PybricksUltrasonicSensor(self.port)
+        self.sensor = InfraredSensor(self.port) # This will cause an error ! remove line and uncomment the one above!
 
         self.target_distance = 0.0
 

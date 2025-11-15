@@ -10,7 +10,7 @@ from time import time
 from pybricks.tools import StopWatch
 from utils.singleton import singleton
 
-from Software.software_ev3.hardware.robot_hub import RobotHub
+from hardware.robot_hub import RobotHub
 
 
 @singleton
@@ -43,7 +43,7 @@ class DataLogger:
     def _file_exists(self):
         """Check if the log file exists (MicroPython compatible)."""
         try:
-            f = open(self.log_file, 'r')
+            f = open(self.log_file, 'w')
             f.close()
             return True
         except OSError:
