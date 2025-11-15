@@ -2,6 +2,8 @@ from config.ports import PORTS
 from config.constants import CONSTANTS
 from pybricks.ev3devices import Motor
 
+from hardware.robot_hub import RobotHub
+
 from utils.singleton import singleton
 from utils.data_logger import log_data
 
@@ -20,12 +22,15 @@ class DriveMotor:
         self._power = 0
 
         # PID controller
-        self.base_resistance = CONSTANTS.get("DRIVE_MOTOR_BASE_RESISTANCE", 0.0001)
+        self.base_resistance = CONSTANTS["DRIVE_MOTOR_BASE_RESISTANCE"]
 
-        self.kp = CONSTANTS.get("DRIVE_MOTOR_KP", 1)
-        self.ki = CONSTANTS.get("DRIVE_MOTOR_KI", 1)
-        self.kd = CONSTANTS.get("DRIVE_MOTOR_KD", 0)
-        self.kslope = CONSTANTS.get("SPEED_COMPENSATION_PER_RESISTANCE", 0.0001)
+        self.kp = CONSTANTS["DRIVE_MOTOR_KP"]
+
+        self.ki = CONSTANTS["DRIVE_MOTOR_KI"]
+        self.max_integral = CONSTANTS["DRIVE_MOTOR_MAX_I"]
+
+        self.kd = CONSTANTS["DRIVE_MOTOR_KD"]
+        self.kslope = CONSTANTS["SPEED_COMPENSATION_PER_RESISTANCE"]
 
         self.integral = 0.0
         self.previous_error = 0.0
@@ -40,11 +45,13 @@ class DriveMotor:
         return self._power
 
     def drive(self, speed):
+        log_data("target_speed", speed)
         self.target_speed = speed
 
     def update(self, dt):
         log_data("drive_motor_speed", self.motor.speed())
         log_data("drive_motor_power", self.get_power())
+        log_data("target_speed", self.target_speed)
 
         self._pid_controller(dt)
         self._update_resistance()
@@ -55,14 +62,24 @@ class DriveMotor:
 
         # proportional
         p = self.kp * error
+        log_data("p", p)
 
         # integral
-        self.integral += error * dt
-        i = self.ki * self.integral
+        if abs(self.motor.speed() < 5):
+            # ensure motor doesn't overshoot so much when it was halted
+            i = 0
+            self.integral = 0
+        else:
+            self.integral += error * dt
+            i = self.ki * self.integral
+            i = min(max(i, -self.max_integral), self.max_integral)
+        log_data("i", i)
+
 
         # derivative
         derivative = (error * dt) / dt
         d = self.kd * derivative
+        log_data("d", d)
 
         self.set_power(p + i + d)
         self.previous_error = error
@@ -83,9 +100,11 @@ class DriveMotor:
         self.past_resistances.append(resistance)
 
     def get_speed_error(self):
-        return self.target_speed - self.motor.speed()
+        speed_error = self.target_speed - self.motor.speed()
+        return speed_error
 
     def _slope_correction(self, dt):
+        return
         resistance = self.get_resistance()
         slope_correction = self.kslope * (resistance) + self.base_resistance
-        self.drive(self._power + slope_correction)
+        self.drive(self._power + slope_correction) # using "drive" methode is wrong

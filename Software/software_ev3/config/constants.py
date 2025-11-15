@@ -84,20 +84,20 @@ CONSTANTS = {
     # ============================================================================
     # Proportional gain: power output per speed error
     # Higher values = faster response but may cause overshoot/oscillation
-    "DRIVE_SPEED_KP": .1,
+    "DRIVE_MOTOR_KP": .1,
     
     # Integral gain: power output per speed error per second
     # Eliminates steady-state error but can cause windup if too high
-    "DRIVE_SPEED_KI": 0.1,
+    "DRIVE_MOTOR_KI": 0.03,
+    "DRIVE_MOTOR_MAX_I": 80,
 
     # Derivative gain:
-    "DRIVE_SPEED_KD": 0.1,
+    "DRIVE_MOTOR_KD": 0.005,
 
-    """
-    K_p 0.1 → 10 Start small; increase until system responds quickly but doesn’t overshoot too much.
-    K_i 0.01 → 1 Usually smaller than K_p; increase slowly to remove steady-state error.
-    K_d 0 → 1 Typically smallest; helps stabilize oscillations. Start with 0 and add only if needed.
-    """
+    
+    #K_p 0.1 → 10 Start small; increase until system responds quickly but doesn’t overshoot too much.
+    #K_i 0.01 → 1 Usually smaller than K_p; increase slowly to remove steady-state error.
+    #K_d 0 → 1 Typically smallest; helps stabilize oscillations. Start with 0 and add only if needed.
     
     # Speed compensation factor for slope compensation
     # How much to increase target speed per unit of resistance increase
