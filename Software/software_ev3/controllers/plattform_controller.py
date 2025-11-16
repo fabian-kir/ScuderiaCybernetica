@@ -28,49 +28,10 @@ class PlattformController:
         #self.pid_from_ultrasonic_sensor(dt)
 
     def pid_from_color_sensor(self, dt):
-        """
-        PID controller for platform balance using color sensor (X-axis).
-        
-        Maintains platform level by keeping reflection error at zero.
-        Uses PID control with speed and angle limits to ensure smooth,
-        reactive corrections without imparting impulse to objects on platform.
-        
-        Args:
-            dt: Time delta in seconds since last update
-        """
-        # Get current error (positive when platform needs to tilt to correct)
         error = self.color_sensor.get_reflection_error()
-        
-        # Proportional term: immediate response to current error
-        p_term = CONSTANTS["PLATFORM_COLOR_KP"] * error
-        
-        # Integral term: accumulates error over time to eliminate steady-state error
-        # Prevents integral windup by clamping the accumulated value
-        self.color_integral += error * dt
-        max_integral = CONSTANTS["PLATFORM_MAX_INTEGRAL_X"]
-        self.color_integral = max(-max_integral, min(max_integral, self.color_integral))
-        i_term = CONSTANTS["PLATFORM_COLOR_KI"] * self.color_integral
-        
-        # Derivative term: responds to rate of change of error (dampens oscillations)
-        error_rate = (error - self.color_previous_error) / dt if dt > 0 else 0.0
-        d_term = CONSTANTS["PLATFORM_COLOR_KD"] * error_rate
-        self.color_previous_error = error
-        
-        # Calculate total angle correction
-        angle_correction = p_term + i_term + d_term
-        
-        # Limit angle correction per update to prevent sudden movements
-        max_correction = CONSTANTS["PLATFORM_MAX_ANGLE_CORRECTION_X"]
-        angle_correction = max(-max_correction, min(max_correction, angle_correction))
-        
-        # Only move if correction is significant (avoid jitter from noise)
-        if abs(angle_correction) > CONSTANTS["CORRECTION_ERROR_TRESHOLD"]:
-            # Limit speed to prevent impulse
-            max_speed = CONSTANTS["PLATFORM_MAX_SPEED_X"]
-            self.plattform_motors.move_plattform(
-                d_angle_x=angle_correction,
-                speed_x=max_speed
-            )
+
+        correction_angle = error * CONSTANTS["PLATFORM_COLOR_KP"]
+        self.plattform_motors.move_plattform(d_angle_x=correction_angle, d_angle_y=0, speed_x=(correction_angle/100)*CONSTANTS["PLATFORM_MAX_SPEED_X"], speed_y=0)
 
 
     '''

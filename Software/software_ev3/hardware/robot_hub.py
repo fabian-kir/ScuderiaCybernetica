@@ -35,9 +35,6 @@ class RobotHub:
         """Make a simple beep."""
         self.hub.speaker.beep()
 
-    def play_startup_sound(self):
-        self.hub.speaker.play_file(SoundFile.SPEED_UP)
-
     def set_led(self, color):
         """Change LED color."""
         self.hub.light.on(color)

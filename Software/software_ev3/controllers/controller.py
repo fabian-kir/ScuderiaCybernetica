@@ -40,10 +40,9 @@ class Controller:
 
     def run(self):
         """Main control loop with delta timing using Pybricks StopWatch."""
-        RobotHub().play_startup_sound()
-
+        
         # Values for testing
-        self.drive_motor.drive(500)
+        self.drive_motor.drive(0)
 
         # Main Loop
         self.running = True
