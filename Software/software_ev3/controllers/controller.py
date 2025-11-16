@@ -8,7 +8,7 @@ from hardware.drive_motor import DriveMotor
 from hardware.ultrasonic_sensor import UltrasonicSensor
 from hardware.color_sensor import ColorSensor
 
-from controllers.plattform_controller import PlattformController
+from controllers.platform_controller import PlatformController
 
 from pybricks.tools import StopWatch, wait
 import time
@@ -32,7 +32,7 @@ class Controller:
         self.ultrasonic_sensor = UltrasonicSensor()
         self.color_sensor = ColorSensor()
 
-        self.plattform_controller = PlattformController()
+        self.plattform_controller = PlatformController()
 
         self.to_update = [self.hub, self.plattform_motors, self.drive_motor, self.ultrasonic_sensor, self.color_sensor, self.plattform_controller]
 

@@ -5,7 +5,7 @@ from hardware.plattform_motors import PlattformMotors
 from config.constants import CONSTANTS
 
 
-class PlattformController:
+class PlatformController:
     def __init__(self):
         # Initialize sensors and motors
         self.color_sensor = ColorSensor()

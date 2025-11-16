@@ -322,4 +322,17 @@ class ColorSensor:
 				return int(s.value)
 		return 0
 
+class InfraredSensor:
+	def __init__(self, port):
+		self._port = str(getattr(port, "value", port))
+		EMU_STATE.register_sensor(self._port, initial=50.0)
+		process_ui_events()
 
+	def distance(self) -> int:
+		def distance(self) -> float:
+			# Return centimeters to match typical usage; project treats as generic number
+			process_ui_events()
+			for s in EMU_STATE.get_sensors():
+				if s.port == self._port:
+					return s.value
+			return 0.0
