@@ -51,40 +51,17 @@ class PlattformMotors:
             dt: Time delta in seconds since last update
         """
 
-
-    def move_plattform(self, d_angle_x=None, d_angle_y=None, speed_x=None, speed_y=None):
-        """
-        Move the platform by specified angles on X and/or Y axes.
+    def move_x(self, d_angle, spee: int = None):
+        if speed is None:
+            speed = self.default_speed_motor_x
         
-        At least one axis (d_angle_x or d_angle_y) must be specified.
-        If speed is not provided for an axis, the default speed is used.
-        Gear ratios are automatically applied to angle commands.
+        self.motor_x.run_angle(speed, d_angle, then=Stop.HOLD, wait=False)
+
+    def move_y(self, d_angle, speed: int = None):
+        if speed is None:
+            speed = self.default_speed_motor_y
         
-        Args:
-            d_angle_x: Desired angle change in degrees for X-axis (optional)
-            d_angle_y: Desired angle change in degrees for Y-axis (optional)
-            speed_x: Speed in deg/s for X-axis movement (optional, uses default if None)
-            speed_y: Speed in deg/s for Y-axis movement (optional, uses default if None)
-        
-        Raises:
-            AssertionError: If both d_angle_x and d_angle_y are None
-        """
-        assert d_angle_x is not None or d_angle_y is not None, \
-            "At least one axis (d_angle_x or d_angle_y) must be specified"
-
-        if speed_x is None:
-            speed_x = self.default_speed_motor_x
-
-        if speed_y is None:
-            speed_y = self.default_speed_motor_y
-
-        if d_angle_x is not None:
-            # Apply gear ratio: motor rotates by d_angle_x * gear_ratio_x
-            self.motor_x.run_angle(speed_x, d_angle_x * self.gear_ratio_x, then=Stop.HOLD, wait=False)
-
-        if d_angle_y is not None:
-            # Apply gear ratio: motor rotates by d_angle_y * gear_ratio_y
-            self.motor_y.run_angle(speed_y, d_angle_y * self.gear_ratio_y, then=Stop.HOLD, wait=False)
+        self.motor_y.run_angle(speed, d_angle, then=Stop.HOLD, wait=False)
 
     def hold(self):
         """

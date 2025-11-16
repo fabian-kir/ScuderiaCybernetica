@@ -31,7 +31,7 @@ class PlatformController:
         error = self.color_sensor.get_reflection_error()
 
         correction_angle = error * CONSTANTS["PLATFORM_COLOR_KP"]
-        self.plattform_motors.move_plattform(d_angle_x=correction_angle, d_angle_y=0, speed_x=(correction_angle/100)*CONSTANTS["PLATFORM_MAX_SPEED_X"], speed_y=0)
+        self.plattform_motors.move_x(correction_angle)
 
 
     '''
