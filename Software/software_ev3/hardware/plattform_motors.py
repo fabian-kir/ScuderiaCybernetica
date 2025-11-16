@@ -51,13 +51,13 @@ class PlattformMotors:
         if speed is None:
             speed = CONSTANTS.DEFAULT_SPEED_BALANCE_X
         
-        self.motor_x.run_angle(speed, d_angle, then=Stop.HOLD, wait=False)
+        self.motor_x.run_target(speed, d_angle, then=Stop.HOLD, wait=False)
 
     def move_y(self, d_angle, speed: int = None):
         if speed is None:
             speed = CONSTANTS.DEFAULT_SPEED_BALANCE_Y
         
-        self.motor_y.run_angle(speed, d_angle, then=Stop.HOLD, wait=False)
+        self.motor_y.run_target(speed, d_angle, then=Stop.HOLD, wait=False)
 
     def hold(self):
         """

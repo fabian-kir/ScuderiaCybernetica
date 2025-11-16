@@ -26,6 +26,10 @@ class PlatformController:
 
         correction_angle = error * CONSTANTS.PLATFORM_COLOR_KP
         speed = int(abs(CONSTANTS.MAX_SPEED_BALANCE_X * correction_angle / 100)) # important to abs here!
+
+        if correction_angle == 0 or speed == 0:
+            return 
+
         log_data("correction_angle", correction_angle)
         log_data("speed", speed)
 
