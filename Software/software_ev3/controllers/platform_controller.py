@@ -24,10 +24,10 @@ class PlatformController:
     def control_color_sensor(self, dt):
         error = self.color_sensor.get_reflection_error() # this is already the relative error because the calibration in the beginning ensures it
 
-        correction_angle = error * CONSTANTS.PLATFORM_COLOR_KP
-        speed = int(abs(CONSTANTS.MAX_SPEED_BALANCE_X * correction_angle / 100)) # important to abs here!
+        correction_angle = error * CONSTANTS.PLATFORM_X_KP
+        speed = int(abs(correction_angle - self.plattform_motors.get_angle_x()) * CONSTANTS.PROPORTIONAL_SPEED_BALANCE_X)
 
-        if correction_angle == 0 or speed == 0:
+        if abs(correction_angle) < CONSTANTS.PLATFORM_X_CORRECTION_TRESHOLD or speed==0:
             return 
 
         log_data("correction_angle", correction_angle)
