@@ -25,7 +25,7 @@ class PlatformController:
         error = self.color_sensor.get_reflection_error() # this is already the relative error because the calibration in the beginning ensures it
 
         correction_angle = error * CONSTANTS.PLATFORM_COLOR_KP
-        speed = int(CONSTANTS.MAX_SPEED_BALANCE_X * correction_angle / 100)
+        speed = int(abs(CONSTANTS.MAX_SPEED_BALANCE_X * correction_angle / 100)) # important to abs here!
         log_data("correction_angle", correction_angle)
         log_data("speed", speed)
 
