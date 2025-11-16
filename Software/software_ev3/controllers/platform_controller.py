@@ -12,14 +12,6 @@ class PlatformController:
         self.ultrasonic_sensor = UltrasonicSensor()
         self.plattform_motors = PlattformMotors()
         
-        # Initialize PID state for color sensor (X-axis)
-        self.color_integral = 0.0
-        self.color_previous_error = 0.0
-        
-        # Initialize PID state for ultrasonic sensor (Y-axis)
-        self.ultrasonic_integral = 0.0
-        self.ultrasonic_previous_error = 0.0
-        
         # Run calibration (will reset PID state)
         self.run_calibration()
 
@@ -30,7 +22,7 @@ class PlatformController:
     def pid_from_color_sensor(self, dt):
         error = self.color_sensor.get_reflection_error()
 
-        correction_angle = error * CONSTANTS["PLATFORM_COLOR_KP"]
+        correction_angle = error * CONSTANTS.PLATFORM_COLOR_KP
         self.plattform_motors.move_x(correction_angle)
 
 

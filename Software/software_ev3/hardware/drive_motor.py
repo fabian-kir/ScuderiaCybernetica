@@ -22,15 +22,15 @@ class DriveMotor:
         self._power = 0
 
         # PID controller
-        self.base_resistance = CONSTANTS["DRIVE_MOTOR_BASE_RESISTANCE"]
+        self.base_resistance = CONSTANTS.DRIVE_MOTOR_BASE_RESISTANCE
 
-        self.kp = CONSTANTS["DRIVE_MOTOR_KP"]
+        self.kp = CONSTANTS.DRIVE_MOTOR_KP
 
-        self.ki = CONSTANTS["DRIVE_MOTOR_KI"]
-        self.max_integral = CONSTANTS["DRIVE_MOTOR_MAX_I"]
+        self.ki = CONSTANTS.DRIVE_MOTOR_KI
+        self.max_integral = CONSTANTS.DRIVE_MOTOR_MAX_I
 
-        self.kd = CONSTANTS["DRIVE_MOTOR_KD"]
-        self.kslope = CONSTANTS["SPEED_COMPENSATION_PER_RESISTANCE"]
+        self.kd = CONSTANTS.DRIVE_MOTOR_KD
+        self.kslope = CONSTANTS.SPEED_COMPENSATION_PER_RESISTANCE
 
         self.integral = 0.0
         self.previous_error = 0.0

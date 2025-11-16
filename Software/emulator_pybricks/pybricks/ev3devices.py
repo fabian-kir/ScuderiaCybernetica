@@ -136,7 +136,7 @@ class Motor:
 			elif then_behavior == Stop.BRAKE or (hasattr(then_behavior, 'value') and then_behavior.value == "BRAKE"):
 				self.brake()
 
-	def run_angle(self, speed: float, rotation_angle: float, then=None, wait=True):
+	def run_angle(self, speed: int, rotation_angle: float, then=None, wait=True):
 		"""Run motor at specified speed by a given angle.
 		
 		According to Pybricks API: Runs the motor at a constant speed by a given angle.
@@ -145,7 +145,9 @@ class Motor:
 		from .tools import wait as wait_func
 		from .parameters import Stop
 		import time
-		
+
+		if not isinstance(speed, int):
+			raise TypeError("speed must be an int")
 		# Validate inputs
 		if speed is None:
 			raise ValueError("speed cannot be None")
@@ -204,16 +206,6 @@ class Motor:
 			                    command_then=then,
 			                    command_start_angle=current_angle)
 			process_ui_events()
-
-	def run_target(self, speed: float, target_angle: float, then=None, wait=True):
-		"""Run motor at specified speed towards a given target angle.
-		
-		According to Pybricks API: Runs the motor at a constant speed towards a given target angle.
-		The direction of rotation is automatically selected based on the target angle.
-		"""
-		current_angle = self.angle()
-		angle_diff = target_angle - current_angle
-		self.run_angle(speed, angle_diff, then=then, wait=wait)
 	
 	def run_time(self, speed: float, time_ms: float, then=None, wait=True):
 		"""Run motor at specified speed for a given amount of time.
@@ -224,6 +216,9 @@ class Motor:
 		from .tools import wait as wait_func
 		from .parameters import Stop
 		import time as time_module
+
+		if not isinstance(speed, int):
+			raise TypeError("speed must be an int")
 		
 		# Default "then" behavior is HOLD if not specified
 		if then is None:
