@@ -19,6 +19,9 @@ class CONSTANTS:
     DEFAULT_SPEED_BALANCE_X = 50
     DEFAULT_SPEED_BALANCE_Y = 50
 
+    MAX_SPEED_BALANCE_X = 500
+    MAX_SPEED_BALANCE_Y = 500
+
     # ============================================================================
     # Platform Balance Controller Configuration
     # ============================================================================

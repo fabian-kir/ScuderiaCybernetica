@@ -4,6 +4,8 @@ from hardware.ultrasonic_sensor import UltrasonicSensor
 from hardware.plattform_motors import PlattformMotors
 from config.constants import CONSTANTS
 
+from utils.data_logger import log_data
+
 
 class PlatformController:
     def __init__(self):
@@ -16,14 +18,19 @@ class PlatformController:
         self.run_calibration()
 
     def update(self, dt):
-        self.pid_from_color_sensor(dt)
+        self.control_color_sensor(dt)
         #self.pid_from_ultrasonic_sensor(dt)
 
-    def pid_from_color_sensor(self, dt):
-        error = self.color_sensor.get_reflection_error()
+    def control_color_sensor(self, dt):
+        error = self.color_sensor.get_reflection_error() # this is already the relative error because the calibration in the beginning ensures it
 
         correction_angle = error * CONSTANTS.PLATFORM_COLOR_KP
-        self.plattform_motors.move_x(correction_angle)
+        speed = int(CONSTANTS.MAX_SPEED_BALANCE_X * correction_angle / 100)
+        log_data("correction_angle", correction_angle)
+        log_data("speed", speed)
+
+        RobotHub().print("correction_angle:", correction_angle, "speed:", speed)
+        self.plattform_motors.move_x(correction_angle, speed)
 
 
     '''
