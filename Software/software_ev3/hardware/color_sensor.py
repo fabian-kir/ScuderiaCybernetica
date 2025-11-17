@@ -15,11 +15,22 @@ class ColorSensor:
 
         RobotHub().print("Set up color sensor on port:", self.port)
 
+        self._last_reflections = []
+
     def update(self, dt):
         log_data("color_sensor", self.sensor.reflection())
+        self._last_reflections.append(self.get_absolute_reflection())
 
-    def get_reflection_error(self):
-        """Returns the difference between the current reflection and the target."""
+    def get_reflection_error(self, smoothed_for_iterations=5):
+        """
+        Returns the difference between the current reflection and the target.
+        """
+
+        # smoothing the output so it's averaged across the last iterations in order to get less jiggle in the motor
+        current_reflection = self.sensor.reflection()
+        if smoothed_for_iterations > 0 and len(self._last_reflections) >= smoothed_for_iterations:
+            current_reflection = int(sum(self._last_reflections[:smoothed_for_iterations]) / smoothed_for_iterations)
+
         return self.target_reflection - self.sensor.reflection()
 
     def get_absolute_reflection(self):
