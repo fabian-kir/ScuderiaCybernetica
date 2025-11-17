@@ -37,6 +37,9 @@ class PlattformMotors:
         self.motor_x.hold()
         self.motor_y.hold()
 
+        self.motor_x.control.limits(speed=CONSTANTS.MAX_SPEED_BALANCE_X)
+        self.motor_y.control.limits(speed=CONSTANTS.MAX_SPEED_BALANCE_Y)
+
         RobotHub().print("Set up balance motors x and y on ports:", self.port_x, self.port_y)
 
     def update(self, dt):
@@ -47,11 +50,11 @@ class PlattformMotors:
             dt: Time delta in seconds since last update
         """
 
-    def move_x(self, d_angle, speed: int = None):
+    def move_x(self, angle, speed: int = None):
         if speed is None:
             speed = CONSTANTS.DEFAULT_SPEED_BALANCE_X
         
-        self.motor_x.run_angle(speed, d_angle, then=Stop.HOLD, wait=False)
+        self.motor_x.track_target(angle) # IMPORTANT: use track target, as it ensures no wiggle when small angle changes occur
 
     def move_y(self, d_angle, speed: int = None):
         if speed is None:

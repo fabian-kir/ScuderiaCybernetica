@@ -16,19 +16,16 @@ class CONSTANTS:
 
     # Default speeds for balance platform motors (deg/s)
     # Used when no speed is explicitly specified in move_plattform()
-    DEFAULT_SPEED_BALANCE_X = 50
-    DEFAULT_SPEED_BALANCE_Y = 50
-
-    MAX_SPEED_BALANCE_X = 500
-    MAX_SPEED_BALANCE_Y = 500
+    MAX_SPEED_BALANCE_X = 300
+    MAX_SPEED_BALANCE_Y = 300
+    BALANCE_X_ERROR_DEADBAND = 4 # in degree, if the plattform is within x degree of correct position, adjustment won't start
 
     # ============================================================================
     # Platform Balance Controller Configuration
     # ============================================================================
     # Proportional gain: angle correction per unit of reflection error
     # Higher values = faster response
-    PLATFORM_COLOR_KP = 1
-
+    PLATFORM_X_KP = 1
 
     # ============================================================================
     # Drive Motor PID Controller Configuration

@@ -23,14 +23,17 @@ class PlatformController:
 
     def control_color_sensor(self, dt):
         error = self.color_sensor.get_reflection_error() # this is already the relative error because the calibration in the beginning ensures it
+        correction_angle = error * CONSTANTS.PLATFORM_X_KP
 
-        correction_angle = error * CONSTANTS.PLATFORM_COLOR_KP
-        speed = int(abs(CONSTANTS.MAX_SPEED_BALANCE_X * correction_angle / 100)) # important to abs here!
+        '''
+        if correction_angle < CONSTANTS.BALANCE_X_ERROR_DEADBAND:
+            correction_angle = 0.0
+            log_data("correction_angle", correction_angle)
+            return
+        ''' # Deadbanding might be unnecessary, needs testing with the now introduced "track_target" command in platfform_motors. Was initially introduced to counter motor wiggle.
+
+        self.plattform_motors.move_x(correction_angle)
         log_data("correction_angle", correction_angle)
-        log_data("speed", speed)
-
-        RobotHub().print("correction_angle:", correction_angle, "speed:", speed)
-        self.plattform_motors.move_x(correction_angle, speed)
 
 
     '''
