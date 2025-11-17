@@ -148,10 +148,6 @@ class DataLogger:
             self._file_initialized = False
 
     def set_enabled(self, enabled):
-        """Enable or disable logging."""
-        if self.enabled == enabled:
-            return
-
         self.enabled = enabled
         if enabled:
             self._ensure_file_initialized()

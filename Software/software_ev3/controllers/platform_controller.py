@@ -6,24 +6,33 @@ from config.constants import CONSTANTS
 
 from utils.data_logger import log_data
 
+from Software.software_ev3.hardware.drive_motor import DriveMotor
+
 
 class PlatformController:
     def __init__(self):
         # Initialize sensors and motors
         self.color_sensor = ColorSensor()
         self.ultrasonic_sensor = UltrasonicSensor()
+        self.drive_motor = DriveMotor()
         self.plattform_motors = PlattformMotors()
-        
-        # Run calibration (will reset PID state)
-        self.run_calibration()
 
     def update(self, dt):
-        self.control_color_sensor(dt)
-        #self.pid_from_ultrasonic_sensor(dt)
+        self.control_x(dt)
+        self.control_y(dt)
 
-    def control_color_sensor(self, dt):
+    def control_x(self, dt):
         error = self.color_sensor.get_reflection_error() # this is already the relative error because the calibration in the beginning ensures it
         correction_angle = error * CONSTANTS.PLATFORM_X_KP
+
+    def control_y(self, dt):
+        '''
+        control y from motor resistance
+        '''
+
+        resistance = self.drive_motor.get_resistance()
+        # correction_angle = resistance * CONSTANTS.PLATFORM_Y_KP #TODO !!! this won*'t work without calibration
+
 
         '''
         if correction_angle < CONSTANTS.BALANCE_X_ERROR_DEADBAND:
@@ -82,15 +91,3 @@ class PlatformController:
                 speed_y=max_speed
             )
     '''
-    def run_calibration(self):
-        hub = RobotHub()
-        hub.await_user_confirmation("Set Plattform even, then press middle button to calibrate.")
-
-        self.color_sensor.calibrate_to_current_state()
-        self.ultrasonic_sensor.calibrate_to_current_state()
-        
-        # Reset PID state after calibration to start fresh
-        self.color_integral = 0.0
-        self.color_previous_error = 0.0
-        self.ultrasonic_integral = 0.0
-        self.ultrasonic_previous_error = 0.0

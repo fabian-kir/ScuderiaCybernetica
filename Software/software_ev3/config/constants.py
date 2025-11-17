@@ -6,6 +6,9 @@ Constants are organized by subsystem for better maintainability.
 """
 
 class CONSTANTS:
+    RUN_NEW_CALIBRATION = True # set this to false to use the stored calibration data of the last run
+    PATH_TO_CALIBRATION_DATA = "config/calibration_data.txt"
+
     # ============================================================================
     # Platform/Balance Motor Configuration
     # ============================================================================
@@ -26,6 +29,7 @@ class CONSTANTS:
     # Proportional gain: angle correction per unit of reflection error
     # Higher values = faster response
     PLATFORM_X_KP = 1
+    PLATFORM_Y_KP = 1
 
     # ============================================================================
     # Drive Motor PID Controller Configuration

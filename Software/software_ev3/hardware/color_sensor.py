@@ -37,6 +37,13 @@ class ColorSensor:
         return self.sensor.reflection()
 
     def calibrate_to_current_state(self):
-        self.target_reflection = self.get_absolute_reflection()
+        from utils.calibration_data import calibration_data
 
+        self.target_reflection = self.get_absolute_reflection()
+        calibration_data.color_sensor_target_reflection = self.target_reflection
         RobotHub().print("Calibrated color sensor to current state.")
+
+    def load_calibration_data(self):
+        from utils.calibration_data import calibration_data
+
+        self.target_reflection = calibration_data.color_sensor_target_reflection

@@ -13,6 +13,8 @@ from controllers.platform_controller import PlatformController
 from pybricks.tools import StopWatch, wait
 import time
 
+from Software.software_ev3.config.constants import CONSTANTS
+
 # Import UI event processor for emulator mode
 if os.environ.get("EV3_EMULATOR", "0") in ("1", "true", "True", "yes", "YES"):
     try:
@@ -37,6 +39,8 @@ class Controller:
         self.to_update = [self.hub, self.plattform_motors, self.drive_motor, self.ultrasonic_sensor, self.color_sensor, self.plattform_controller]
 
         self.running = False
+
+        self.load_calibration(recalibrate=CONSTANTS.RUN_NEW_CALIBRATION)
 
     def run(self):
         """Main control loop with delta timing using Pybricks StopWatch."""
@@ -66,6 +70,25 @@ class Controller:
 
         except KeyboardInterrupt:
             self.stop()
+
+    def load_calibration(self, recalibrate=False):
+        from utils.calibration_data import calibration_data
+
+        if recalibrate:
+            hub = RobotHub()
+            hub.await_user_confirmation("Set Plattform even, set motor on a flat road, then press middle button to calibrate.")
+
+            self.color_sensor.calibrate_to_current_state()
+            self.ultrasonic_sensor.calibrate_to_current_state()
+            self.drive_motor.calibrate_to_current_state()
+
+            calibration_data.safe_to_file()
+
+        calibration_data.load_from_file()
+
+        self.color_sensor.load_calibration_data()
+        self.ultrasonic_sensor.load_calibration_data()
+        self.drive_motor.load_calibration_data()
 
     def update(self, dt: float):
         """Periodic update logic."""

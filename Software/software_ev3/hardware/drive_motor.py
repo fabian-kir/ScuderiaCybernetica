@@ -22,7 +22,7 @@ class DriveMotor:
         self._power = 0
 
         # PID controller
-        self.base_resistance = CONSTANTS.DRIVE_MOTOR_BASE_RESISTANCE
+        self.base_resistance = None # loaded during calibration
 
         self.kp = CONSTANTS.DRIVE_MOTOR_KP
 
@@ -55,7 +55,6 @@ class DriveMotor:
 
         self._pid_controller(dt)
         self._update_resistance()
-        self._slope_correction(dt)
 
     def _pid_controller(self, dt):
         error = self.get_speed_error()
@@ -103,8 +102,27 @@ class DriveMotor:
         speed_error = self.target_speed - self.motor.speed()
         return speed_error
 
-    def _slope_correction(self, dt):
-        return
-        resistance = self.get_resistance()
-        slope_correction = self.kslope * (resistance) + self.base_resistance
-        self.drive(self._power + slope_correction) # using "drive" methode is wrong
+    def calibrate_to_current_state(self):
+        from pybricks.tools import wait
+        from utils.calibration_data import CalibrationData
+
+        resistances = []
+        RobotHub.print("Calibrating drive motor...")
+
+        for i in range(20, 20, 100):
+            self.motor.dc(i)
+            wait(3_000) # 2s
+            resistance = self.get_resistance()
+            RobotHub.print("Running at", str(i) + "% dc, resistance:", resistance)
+            resistances.append(resistance)
+
+        avg_resistance = sum(resistances) / len(resistances)
+        RobotHub.print("Average resistance:", avg_resistance)
+
+        self.base_resistance = avg_resistance
+        CalibrationData().drive_motor_base_resistance = avg_resistance
+
+    def load_calibration_data(self):
+        from utils.calibration_data import calibration_data
+
+        self.base_resistance = calibration_data.drive_motor_base_resistance
