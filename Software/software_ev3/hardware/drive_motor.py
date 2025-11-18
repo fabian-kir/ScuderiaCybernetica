@@ -35,8 +35,6 @@ class DriveMotor:
         self.integral = 0.0
         self.previous_error = 0.0
 
-        self.past_resistances = []
-
     def set_power(self, power):
         self._power = power
         self.motor.dc(self._power)
@@ -54,7 +52,7 @@ class DriveMotor:
         log_data("target_speed", self.target_speed)
 
         self._pid_controller(dt)
-        self._update_resistance()
+        # self._update_resistance()
 
     def _pid_controller(self, dt):
         error = self.get_speed_error()
@@ -83,13 +81,13 @@ class DriveMotor:
         self.set_power(p + i + d)
         self.previous_error = error
 
-    def get_resistance(self, n=5):
-        '''Returns the resistance averaged accross last n updates.
-            Resistance means how much more power output realtes to how much speed gain
-        '''
-        return sum(self.past_resistances[-n:]) / n if len(self.past_resistances) >= n else 0.0
+    def get_resistance(self, n=5):   
+        if self._power == 0:
+            return 0
+        return self.motor.speed() / self._power
 
     def _update_resistance(self):
+        """currently unused because functionality isn't debugged"""
         if self.get_power() == 0:
             self.past_resistances = [self.base_resistance] * 10
             return
@@ -107,17 +105,17 @@ class DriveMotor:
         from utils.calibration_data import CalibrationData
 
         resistances = []
-        RobotHub.print("Calibrating drive motor...")
+        RobotHub().print("Calibrating drive motor...")
 
-        for i in range(20, 20, 100):
-            self.motor.dc(i)
+        for i in range(20, 100, 20):
+            self.set_power(i)
             wait(3_000) # 2s
             resistance = self.get_resistance()
-            RobotHub.print("Running at", str(i) + "% dc, resistance:", resistance)
+            RobotHub().print("Running at", str(i) + "% dc, resistance:", resistance)
             resistances.append(resistance)
 
         avg_resistance = sum(resistances) / len(resistances)
-        RobotHub.print("Average resistance:", avg_resistance)
+        RobotHub().print("Average resistance:", avg_resistance)
 
         self.base_resistance = avg_resistance
         CalibrationData().drive_motor_base_resistance = avg_resistance
@@ -126,3 +124,4 @@ class DriveMotor:
         from utils.calibration_data import calibration_data
 
         self.base_resistance = calibration_data.drive_motor_base_resistance
+        RobotHub().print("loaded drive motor base resistance to:", self.base_resistance)

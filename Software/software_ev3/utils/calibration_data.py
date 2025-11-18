@@ -22,14 +22,19 @@ class CalibrationData:
                 elif line.startswith("drive_motor_base_resistance"):
                     self.drive_motor_base_resistance = float(line.split("=")[1])
 
-    def save_to_file(self):
+    def safe_to_file(self):
         lines = [
             "ultrasound_sensor_target_distance=" + str(self.ultrasound_sensor_target_distance)+ "\n"
-            "color_sensor_target_reflection=" + str(self.ultrasound_sensor_target_distance)+ "\n"
-            "drive_motor_base_resistance=" + str(self.ultrasound_sensor_target_distance) + "\n"
+            "color_sensor_target_reflection=" + str(self.color_sensor_target_reflection)+ "\n"
+            "drive_motor_base_resistance=" + str(self.drive_motor_base_resistance) + "\n"
         ]
 
+        text = ""
+        for linetext in lines:
+            text += linetext
+        print(text)
+
         with open(self.path_to_file, "w") as file:
-            file.writelines(lines)
+            file.write(text)
 
 calibration_data = CalibrationData()

@@ -13,7 +13,7 @@ from controllers.platform_controller import PlatformController
 from pybricks.tools import StopWatch, wait
 import time
 
-from Software.software_ev3.config.constants import CONSTANTS
+from config.constants import CONSTANTS
 
 # Import UI event processor for emulator mode
 if os.environ.get("EV3_EMULATOR", "0") in ("1", "true", "True", "yes", "YES"):
@@ -46,7 +46,7 @@ class Controller:
         """Main control loop with delta timing using Pybricks StopWatch."""
         
         # Values for testing
-        self.drive_motor.drive(0)
+        self.drive_motor.drive(300)
 
         # Main Loop
         self.running = True

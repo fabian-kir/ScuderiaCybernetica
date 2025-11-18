@@ -47,3 +47,4 @@ class ColorSensor:
         from utils.calibration_data import calibration_data
 
         self.target_reflection = calibration_data.color_sensor_target_reflection
+        RobotHub().print("loaded color sensor target reflection to:", self.target_reflection)

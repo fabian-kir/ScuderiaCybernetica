@@ -6,7 +6,7 @@ Constants are organized by subsystem for better maintainability.
 """
 
 class CONSTANTS:
-    RUN_NEW_CALIBRATION = True # set this to false to use the stored calibration data of the last run
+    RUN_NEW_CALIBRATION = False # set this to false to use the stored calibration data of the last run
     PATH_TO_CALIBRATION_DATA = "config/calibration_data.txt"
 
     # ============================================================================
@@ -17,10 +17,6 @@ class CONSTANTS:
     GEAR_RATIO_BALANCE_X = -3
     GEAR_RATIO_BALANCE_Y = 1/1
 
-    # Default speeds for balance platform motors (deg/s)
-    # Used when no speed is explicitly specified in move_plattform()
-    MAX_SPEED_BALANCE_X = 300
-    MAX_SPEED_BALANCE_Y = 300
     BALANCE_X_ERROR_DEADBAND = 4 # in degree, if the plattform is within x degree of correct position, adjustment won't start
 
     # ============================================================================

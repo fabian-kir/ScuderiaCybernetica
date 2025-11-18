@@ -39,3 +39,4 @@ class UltrasonicSensor:
         from utils.calibration_data import calibration_data
 
         self.target_distance = calibration_data.ultrasound_sensor_target_distance
+        RobotHub().print("loaded ultrasonic target distance to:", self.target_distance)

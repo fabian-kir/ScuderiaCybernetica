@@ -6,7 +6,7 @@ from config.constants import CONSTANTS
 
 from utils.data_logger import log_data
 
-from Software.software_ev3.hardware.drive_motor import DriveMotor
+from hardware.drive_motor import DriveMotor
 
 
 class PlatformController:
@@ -25,7 +25,10 @@ class PlatformController:
         error = self.color_sensor.get_reflection_error() # this is already the relative error because the calibration in the beginning ensures it
         correction_angle = error * CONSTANTS.PLATFORM_X_KP
 
+        self.plattform_motors.move_x(correction_angle)
+
     def control_y(self, dt):
+        return # TODO
         '''
         control y from motor resistance
         '''
