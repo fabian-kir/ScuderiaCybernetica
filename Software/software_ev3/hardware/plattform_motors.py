@@ -48,10 +48,16 @@ class PlattformMotors:
         """
 
     def move_x(self, angle):
-        self.motor_x.track_target(angle) # IMPORTANT: use track target, as it ensures no wiggle when small angle changes occur
+        self.motor_x.track_target(angle * self.gear_ratio_x) # IMPORTANT: use track target, as it ensures no wiggle when small angle changes occur
 
     def move_y(self, angle):      
         self.motor_y.track_target(d_angle)
+
+    def run_forever_x(self, speed):
+        self.motor_x.run_forever(speed)
+
+    def run_forever_x(self, speed):
+        self.motor_x.run_forever(speed)
 
     def hold(self):
         """
@@ -64,3 +70,9 @@ class PlattformMotors:
 
     def get_angles(self):
         return self.motor_x.angle(), self.motor_y.angle()
+    
+    def get_angle_x(self):
+        return self.motor_x.angle()
+    
+    def get_angle_y(self):
+        return self.motor_x.angle()

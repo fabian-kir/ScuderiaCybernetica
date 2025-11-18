@@ -6,7 +6,7 @@ Constants are organized by subsystem for better maintainability.
 """
 
 class CONSTANTS:
-    RUN_NEW_CALIBRATION = False # set this to false to use the stored calibration data of the last run
+    RUN_NEW_CALIBRATION = True # set this to false to use the stored calibration data of the last run
     PATH_TO_CALIBRATION_DATA = "config/calibration_data.txt"
 
     # ============================================================================
@@ -17,19 +17,19 @@ class CONSTANTS:
     GEAR_RATIO_BALANCE_X = -3
     GEAR_RATIO_BALANCE_Y = 1/1
 
-    BALANCE_X_ERROR_DEADBAND = 4 # in degree, if the plattform is within x degree of correct position, adjustment won't start
-
     # ============================================================================
     # Platform Balance Controller Configuration
     # ============================================================================
     # Proportional gain: angle correction per unit of reflection error
     # Higher values = faster response
-    PLATFORM_X_KP = 1
+    PLATFORM_X_KP = 20
     PLATFORM_Y_KP = 1
 
     # ============================================================================
     # Drive Motor PID Controller Configuration
     # ============================================================================
+    DRIVE_MOTOR_MIN_POWER = 10
+
     # Proportional gain: power output per speed error
     # Higher values = faster response but may cause overshoot/oscillation
     DRIVE_MOTOR_KP = .1
@@ -46,11 +46,4 @@ class CONSTANTS:
     # K_i 0.01 → 1 Usually smaller than K_p; increase slowly to remove steady-state error.
     # K_d 0 → 1 Typically smallest; helps stabilize oscillations. Start with 0 and add only if needed.
 
-    # Speed compensation factor for slope compensation
-    # How much to increase target speed per unit of resistance increase
-    # Higher resistance (uphill) = higher target speed to maintain constant velocity
-    # Units: deg/s per resistance unit
-    # Typical range: 10.0 - 30.0
-    SPEED_COMPENSATION_PER_RESISTANCE = 20.0
-    DRIVE_MOTOR_BASE_RESISTANCE = .0001  # the resistance the drive motor experiences when just going straight
-    # and not uphill - needs to be adjusted when robots weight changes
+    DRIVE_MOTOR_RESISTANCES_AVERAGING_STEPS = 20 # how many cycles the output of get_resistance will be averaged accross

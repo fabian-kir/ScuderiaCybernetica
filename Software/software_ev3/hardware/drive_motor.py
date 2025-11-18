@@ -22,7 +22,7 @@ class DriveMotor:
         self._power = 0
 
         # PID controller
-        self.base_resistance = None # loaded during calibration
+        self.base_resistance = 0 # loaded during calibration
 
         self.kp = CONSTANTS.DRIVE_MOTOR_KP
 
@@ -30,12 +30,24 @@ class DriveMotor:
         self.max_integral = CONSTANTS.DRIVE_MOTOR_MAX_I
 
         self.kd = CONSTANTS.DRIVE_MOTOR_KD
-        self.kslope = CONSTANTS.SPEED_COMPENSATION_PER_RESISTANCE
 
         self.integral = 0.0
         self.previous_error = 0.0
 
+        self.past_resistances = []
+
     def set_power(self, power):
+        if power == 0:
+            self._power = 0
+            self.motor.hold()
+            return
+        
+        elif 0 < abs(power) < CONSTANTS.DRIVE_MOTOR_MIN_POWER:
+            self._power = CONSTANTS.DRIVE_MOTOR_MIN_POWER
+        
+        elif 0 > abs(power) > CONSTANTS.DRIVE_MOTOR_MIN_POWER:
+            self._power = -CONSTANTS.DRIVE_MOTOR_MIN_POWER
+
         self._power = power
         self.motor.dc(self._power)
 
@@ -43,6 +55,9 @@ class DriveMotor:
         return self._power
 
     def drive(self, speed):
+        if speed == 0:
+            self.motor.hold()
+
         log_data("target_speed", speed)
         self.target_speed = speed
 
@@ -52,7 +67,9 @@ class DriveMotor:
         log_data("target_speed", self.target_speed)
 
         self._pid_controller(dt)
-        # self._update_resistance()
+
+        self._update_resistance        
+        RobotHub().print("drive_motor_resistance:", self.get_resistance())
 
     def _pid_controller(self, dt):
         error = self.get_speed_error()
@@ -82,15 +99,22 @@ class DriveMotor:
         self.previous_error = error
 
     def get_resistance(self, n=5):   
-        if self._power == 0:
+        if self.get_power == 0:
             return 0
-        return self.motor.speed() / self._power
+        
+        n = CONSTANTS.DRIVE_MOTOR_RESISTANCES_AVERAGING_STEPS
+
+        res = 0
+        if len(self.past_resistances) > 0:
+            res = sum(self.past_resistances[:n]) / n
+        else:
+            res = self.motor.speed() / self.get_power()
+
+        return res - self.base_resistance
 
     def _update_resistance(self):
-        """currently unused because functionality isn't debugged"""
         if self.get_power() == 0:
-            self.past_resistances = [self.base_resistance] * 10
-            return
+            self.past_resistances = []
 
         '''Adds a new resistance measurement to the past measurements.'''
         resistance = self.motor.speed() / self.get_power() # in (rad / s) / V
@@ -109,7 +133,7 @@ class DriveMotor:
 
         for i in range(20, 100, 20):
             self.set_power(i)
-            wait(3_000) # 2s
+            wait(3_000) # 3s
             resistance = self.get_resistance()
             RobotHub().print("Running at", str(i) + "% dc, resistance:", resistance)
             resistances.append(resistance)

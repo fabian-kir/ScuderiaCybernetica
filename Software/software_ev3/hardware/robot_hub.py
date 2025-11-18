@@ -1,6 +1,7 @@
 from pybricks.hubs import EV3Brick
 from pybricks.parameters import Button
 from pybricks.media.ev3dev import SoundFile
+from pybricks.media.ev3dev import Font
 import time
 
 from utils.singleton import singleton
@@ -17,6 +18,8 @@ class RobotHub:
     def __init__(self, enable_startup_feedback = True):
         print("Setting up the EV3 Hub")
         self.hub = EV3Brick()
+
+        self.hub.screen.set_font(Font(size=6))
         
         if enable_startup_feedback:
             self.hub.speaker.beep()
