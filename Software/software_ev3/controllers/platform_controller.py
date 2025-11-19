@@ -19,13 +19,14 @@ class PlatformController:
 
     def update(self, dt):
         self.control_x(dt)
-        self.control_y(dt)
+        #self.control_y(dt)
 
     def control_x(self, dt):
         error = self.color_sensor.get_reflection_error() # this is already the relative error because the calibration in the beginning ensures it
-        correction_angle = error * CONSTANTS.PLATFORM_X_KP
+        scaled_error = error * CONSTANTS.PLATFORM_X_KP
 
-        self.plattform_motors.move_x(correction_angle)
+        self.plattform_motors.run_forever_x(scaled_error)
+        RobotHub().print("speed:", scaled_error)
 
     def control_y(self, dt):
         return # TODO

@@ -66,10 +66,10 @@ class DriveMotor:
         log_data("drive_motor_power", self.get_power())
         log_data("target_speed", self.target_speed)
 
-        self._pid_controller(dt)
+        # self._pid_controller(dt) # currently not pid controlling speed
+        self.set_power(0) # TODO Change Back
 
-        self._update_resistance()    
-        RobotHub().print("drive_motor_resistance:", self.get_resistance())
+        # self._update_resistance()    
 
     def _pid_controller(self, dt):
         error = self.get_speed_error()
@@ -124,6 +124,7 @@ class DriveMotor:
         return speed_error
 
     def calibrate_to_current_state(self):
+        return # TODO remove
         from pybricks.tools import wait
         from utils.calibration_data import CalibrationData
 

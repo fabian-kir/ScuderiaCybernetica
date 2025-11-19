@@ -31,12 +31,12 @@ class Controller:
         self.hub = RobotHub()
         self.plattform_motors = PlattformMotors()
         self.drive_motor = DriveMotor()
-        self.ultrasonic_sensor = UltrasonicSensor()
+        #self.ultrasonic_sensor = UltrasonicSensor()
         self.color_sensor = ColorSensor()
 
         self.plattform_controller = PlatformController()
 
-        self.to_update = [self.hub, self.plattform_motors, self.drive_motor, self.ultrasonic_sensor, self.color_sensor, self.plattform_controller]
+        self.to_update = [self.hub, self.plattform_motors, self.drive_motor, self.color_sensor, self.plattform_controller]
 
         self.running = False
 
@@ -46,7 +46,7 @@ class Controller:
         """Main control loop with delta timing using Pybricks StopWatch."""
         
         # Values for testing
-        self.drive_motor.drive(700)
+        self.drive_motor.drive(0)
 
         # Main Loop
         self.running = True
@@ -79,7 +79,7 @@ class Controller:
             hub.await_user_confirmation("Set Plattform even, set motor on a flat road, then press middle button to calibrate.")
 
             self.color_sensor.calibrate_to_current_state()
-            self.ultrasonic_sensor.calibrate_to_current_state()
+            #self.ultrasonic_sensor.calibrate_to_current_state()
             self.drive_motor.calibrate_to_current_state()
 
             calibration_data.safe_to_file()
@@ -87,7 +87,7 @@ class Controller:
         calibration_data.load_from_file()
 
         self.color_sensor.load_calibration_data()
-        self.ultrasonic_sensor.load_calibration_data()
+        #self.ultrasonic_sensor.load_calibration_data()
         self.drive_motor.load_calibration_data()
 
     def update(self, dt: float):

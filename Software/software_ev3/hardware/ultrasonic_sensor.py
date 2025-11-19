@@ -10,6 +10,7 @@ from hardware.robot_hub import RobotHub
 @singleton
 class UltrasonicSensor:
     def __init__(self):
+        return
         self.port = PORTS["ULTRASONIC_SENSOR"]
         # self.sensor = PybricksUltrasonicSensor(self.port)
         self.sensor = InfraredSensor(self.port) # This will cause an error ! remove line and uncomment the one above!
@@ -19,6 +20,7 @@ class UltrasonicSensor:
         RobotHub().print("Set up ultrasonic sensor on port:", self.port)
 
     def calibrate_to_current_state(self):
+        return 
         from utils.calibration_data import calibration_data
 
         self.target_distance = self.get_absolute_distance()
@@ -26,13 +28,16 @@ class UltrasonicSensor:
         RobotHub().print("Calibrated ultrasonic sensor to current state.")
 
     def update(self, dt):
+        return 
         log_data("ultrasonic_sensor", self.sensor.distance())
 
     def get_distance_error(self):
+        return 0
         """Returns the difference between the current distance and the target."""
         return self.target_distance - self.sensor.distance()
 
     def get_absolute_distance(self):
+        return 0
         return self.sensor.distance()
 
     def load_calibration_data(self):

@@ -7,7 +7,6 @@ class CalibrationData:
     def __init__(self):
         self.path_to_file = CONSTANTS.PATH_TO_CALIBRATION_DATA
 
-        self.ultrasound_sensor_target_distance = None
         self.color_sensor_target_reflection = None
         self.drive_motor_base_resistance = None
 
@@ -15,16 +14,20 @@ class CalibrationData:
         with open(self.path_to_file, "r") as file:
             for line in file.readlines():
                 line = line.strip("")
-                if line.startswith("ultrasound_sensor_target_distance"):
-                    self.ultrasound_sensor_target_distance = float(line.split("=")[1])
-                elif line.startswith("color_sensor_target_reflection"):
+                #if line.startswith("ultrasound_sensor_target_distance"):
+                    #self.ultrasound_sensor_target_distance = float(line.split("=")[1])
+                if line.startswith("color_sensor_target_reflection"):
                     self.color_sensor_target_reflection = float(line.split("=")[1])
                 elif line.startswith("drive_motor_base_resistance"):
                     self.drive_motor_base_resistance = float(line.split("=")[1])
 
     def safe_to_file(self):
+        if self.drive_motor_base_resistance is None:
+            self.drive_motor_base_resistance = 0
+        if self.color_sensor_target_reflection is None:
+            self.color_sensor_target_reflection = 0
+
         lines = [
-            "ultrasound_sensor_target_distance=" + str(self.ultrasound_sensor_target_distance)+ "\n"
             "color_sensor_target_reflection=" + str(self.color_sensor_target_reflection)+ "\n"
             "drive_motor_base_resistance=" + str(self.drive_motor_base_resistance) + "\n"
         ]

@@ -6,7 +6,7 @@ Constants are organized by subsystem for better maintainability.
 """
 
 class CONSTANTS:
-    RUN_NEW_CALIBRATION = False # set this to false to use the stored calibration data of the last run
+    RUN_NEW_CALIBRATION = True # set this to false to use the stored calibration data of the last run
     PATH_TO_CALIBRATION_DATA = "config/calibration_data.txt"
 
     # ============================================================================
@@ -14,15 +14,15 @@ class CONSTANTS:
     # ============================================================================
     # Gear ratios for balance platform motors
     # Applied to angle commands: actual_motor_angle = command_angle * gear_ratio
-    GEAR_RATIO_BALANCE_X = -3
-    GEAR_RATIO_BALANCE_Y = 1/1
+    GEAR_RATIO_BALANCE_X = 3
+    GEAR_RATIO_BALANCE_Y = 1
 
     # ============================================================================
     # Platform Balance Controller Configuration
     # ============================================================================
     # Proportional gain: angle correction per unit of reflection error
     # Higher values = faster response
-    PLATFORM_X_KP = 20
+    PLATFORM_X_KP = -3
     PLATFORM_Y_KP = 1
 
     # ============================================================================

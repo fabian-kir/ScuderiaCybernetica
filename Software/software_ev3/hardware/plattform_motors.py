@@ -20,16 +20,16 @@ class PlattformMotors:
     
     def __init__(self):
         """Initialize platform motors with configuration from constants."""
-        self.port_x = PORTS["SMALL_BALANCE_MOTOR"]
-        self.port_y = PORTS["LARGE_BALANCE_MOTOR"]
+        self.port_x = PORTS["LARGE_BALANCE_MOTOR"]
+        self.port_y = PORTS["SMALL_BALANCE_MOTOR"]
 
         # Gear ratios applied to angle commands
         # actual_motor_angle = command_angle * gear_ratio
         self.gear_ratio_x = CONSTANTS.GEAR_RATIO_BALANCE_X
         self.gear_ratio_y = CONSTANTS.GEAR_RATIO_BALANCE_Y
 
-        self.motor_x = Motor(self.port_x)
-        self.motor_y = Motor(self.port_y)
+        self.motor_x = Motor(self.port_x, gears=[self.gear_ratio_x, ])
+        self.motor_y = Motor(self.port_y, gears=[self.gear_ratio_y, ])
 
         self.motor_x.reset_angle(0)
         self.motor_y.reset_angle(0)
@@ -51,13 +51,10 @@ class PlattformMotors:
         self.motor_x.track_target(angle * self.gear_ratio_x) # IMPORTANT: use track target, as it ensures no wiggle when small angle changes occur
 
     def move_y(self, angle):      
-        self.motor_y.track_target(d_angle)
+        return
 
     def run_forever_x(self, speed):
-        self.motor_x.run_forever(speed)
-
-    def run_forever_x(self, speed):
-        self.motor_x.run_forever(speed)
+        self.motor_x.run(speed)
 
     def hold(self):
         """
