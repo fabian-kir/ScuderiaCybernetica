@@ -28,8 +28,8 @@ class PlattformMotors:
         self.gear_ratio_x = CONSTANTS.GEAR_RATIO_BALANCE_X
         self.gear_ratio_y = CONSTANTS.GEAR_RATIO_BALANCE_Y
 
-        self.motor_x = Motor(self.port_x, gears=[self.gear_ratio_x, ])
-        self.motor_y = Motor(self.port_y, gears=[self.gear_ratio_y, ])
+        self.motor_x = Motor(self.port_x, gears=[self.gear_ratio_x])
+        self.motor_y = Motor(self.port_y, gears=[12, 20])
 
         self.motor_x.reset_angle(0)
         self.motor_y.reset_angle(0)
@@ -38,6 +38,9 @@ class PlattformMotors:
         self.motor_y.hold()
 
         RobotHub().print("Set up balance motors x and y on ports:", self.port_x, self.port_y)
+        
+        self.integral = 0
+        self.last_error = 0
 
     def update(self, dt):
         if self.motor_x.angle() > CONSTANTS.MOTOR_X_MAX_DEGREE:
@@ -46,7 +49,7 @@ class PlattformMotors:
         elif self.motor_x.angle() < -CONSTANTS.MOTOR_X_MAX_DEGREE:
             self.motor_x.track_target(-CONSTANTS.MOTOR_X_MAX_DEGREE)
 
-
+        
         """
         Periodic update method called by the main controller loop.
         
@@ -82,4 +85,16 @@ class PlattformMotors:
         return self.motor_x.angle()
     
     def get_angle_y(self):
-        return self.motor_x.angle()
+        return self.motor_y.angle()
+    
+    def track_target_y(self, angle, kp, ki, kd):
+        error = angle - self.get_angle_y()
+
+        self.integral = 0.9 * self.integral + error
+
+        derivative = error - self.last_error
+        self.last_error = error
+        
+        power = kp * error + ki * self.integral + kd * derivative
+        self.motor_y.run(power)
+        

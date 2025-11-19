@@ -4,31 +4,19 @@ class InterpolationFromArray:
 
     def interpolate(self, x):
         # Ensure x is within the bounds of the array
-        if x < 0 or x >= len(self.array):
-            raise ValueError("x must be within the bounds of the array indices.")
+        if x >= self.array[0][0]:
+            return self.array[0][1]
+        if x <= self.array[-1][0]:
+            return self.array[-1][1]
 
-        # If x is an integer, no interpolation is needed
-        if x.is_integer():
-            return self.array[int(x)]
+        for i in range(len(self.array) -1):
+            x1, y1 = self.array[1]
+            x2, y2 = self.array[i +1]
 
-        # Find the two nearest indices around x
-        x1 = int(x)
-        x2 = x1 + 1
-
-        # If x1 is the last index, no interpolation is possible
-        if x2 >= len(self.array):
-            raise ValueError("x is too large for interpolation.")
-
-        # Perform linear interpolation
-        y1 = self.array[x1]
-        y2 = self.array[x2]
+            if x2 <= x <= x1:
+                t = (x - x2) / (x1 - x2)
+                return y2 + t * (y1 - y2)
         
-        # Calculate interpolated value using the formula
-        return y1 + (x - x1) * (y2 - y1) / (x2 - x1)
+        return 0
 
-# Example usage:
-array = [1, 3, 7, 11]
-interpolator = InterpolationFromArray(array)
 
-# Interpolating between index 1 and 2
-print(interpolator.interpolate(1.5))  # Output will be between 3 and 7

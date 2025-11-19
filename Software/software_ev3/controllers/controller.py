@@ -85,7 +85,7 @@ class Controller:
 
         self.color_sensor.load_calibration_data()
 
-        self.drive_motor.run_calibration()
+        #self.drive_motor.run_calibration()
 
     def update(self, dt: float):
         """Periodic update logic."""

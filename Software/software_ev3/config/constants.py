@@ -15,7 +15,7 @@ class CONSTANTS:
     # Gear ratios for balance platform motors
     # Applied to angle commands: actual_motor_angle = command_angle * gear_ratio
     GEAR_RATIO_BALANCE_X = 3
-    GEAR_RATIO_BALANCE_Y = 1
+    GEAR_RATIO_BALANCE_Y = 1.667
 
     # ============================================================================
     # Platform Balance Controller Configuration
@@ -53,4 +53,5 @@ class CONSTANTS:
     DRIVE_MOTOR_RESISTANCES_AVERAGING_STEPS = 20 # how many cycles the output of get_resistance will be averaged accross
 
     # AT 3V
-    SLOPE_SPEED_ARRAY = [(421.78, -20), (400.00, -15), (379.1, -10), (346.46, -5), (296.6, 0), (250.76, 5), (210.64, 10), (165.38, 15), (102.34, 20)]
+    SLOPE_SPEED_ARRAY = [(410.48, -20), (389.88, -15), (364.92, -10), (334.34, -5), (300.00, 0), (267, 5), (218.92, 10), (171.84, 15), (112.92, 20)]
+    

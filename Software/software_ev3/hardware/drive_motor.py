@@ -74,7 +74,7 @@ class DriveMotor:
         # self._pid_controller(dt) # currently not pid controlling speed
 
         self.drive_at_constant_power(dt)
-        self._update_resistance()
+        #self._update_resistance()
 
     def drive_at_constant_power(self, dt):
         target_percent = CONSTANTS.DRIVE_MOTOR_CONSTANT_POWER / (RobotHub().get_battery_power())
