@@ -91,7 +91,7 @@ class DriveMotor:
 
 
         # derivative
-        derivative = (error * dt) / dt
+        derivative = (error * self.previous_error) / dt
         d = self.kd * derivative
         log_data("d", d)
 
