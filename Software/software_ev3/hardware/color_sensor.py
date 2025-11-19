@@ -18,7 +18,7 @@ class ColorSensor:
         self._last_reflections = []
 
     def update(self, dt):
-        log_data("color_sensor", self.sensor.reflection())
+        log_data("color_sensor", self.get_reflection_error())
         self._last_reflections.append(self.get_absolute_reflection())
 
     def get_reflection_error(self, smoothed_for_iterations=5):

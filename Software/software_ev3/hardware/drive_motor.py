@@ -35,8 +35,6 @@ class DriveMotor:
         self.integral = 0.0
         self.previous_error = 0.0
 
-        self.past_resistances = []
-
         self.interpolation = InterpolationFromArray(array=CONSTANTS.SLOPE_SPEED_ARRAY)
 
     def set_dc(self, power):
@@ -69,8 +67,6 @@ class DriveMotor:
         log_data("drive_motor_power", self.get_dc())
         log_data("target_speed", self.target_speed)
 
-        RobotHub().print("Speed:", self.motor.speed())
-
         # self._pid_controller(dt) # currently not pid controlling speed
 
         self.drive_at_constant_power(dt)
@@ -79,6 +75,8 @@ class DriveMotor:
     def drive_at_constant_power(self, dt):
         target_percent = CONSTANTS.DRIVE_MOTOR_CONSTANT_POWER / (RobotHub().get_battery_power())
         self.set_dc(target_percent * 100)
+
+        log_data("battery_voltage", RobotHub().get_battery_power())
 
     def _pid_controller(self, dt):
         error = self.get_speed_error()
@@ -108,7 +106,8 @@ class DriveMotor:
         self.previous_error = error
 
     def get_slope_angle(self):
-        return self.interpolation.interpolate(self.motor.speed())
+        slope = self.interpolation.interpolate(self.motor.speed())
+        return slope
 
     def run_calibration(self):
         from pybricks.tools import wait
@@ -198,8 +197,6 @@ class DriveMotor:
         RobotHub().print("\n\n\n")
 
         # ---
-
-
 
     def get_speed_error(self):
         speed_error = self.target_speed - self.motor.speed()

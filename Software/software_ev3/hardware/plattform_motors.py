@@ -2,6 +2,8 @@ from config.ports import PORTS
 from pybricks.ev3devices import Motor
 from pybricks.parameters import Stop
 
+from utils.data_logger import log_data
+
 from utils.singleton import singleton
 from config.constants import CONSTANTS
 
@@ -29,7 +31,8 @@ class PlattformMotors:
         self.gear_ratio_y = CONSTANTS.GEAR_RATIO_BALANCE_Y
 
         self.motor_x = Motor(self.port_x, gears=[self.gear_ratio_x])
-        self.motor_y = Motor(self.port_y, gears=[12, 20])
+        # self.motor_y = Motor(self.port_y, gears=[12, 20])
+        self.motor_y = Motor(self.port_y)
 
         self.motor_x.reset_angle(0)
         self.motor_y.reset_angle(0)
@@ -49,6 +52,8 @@ class PlattformMotors:
         elif self.motor_x.angle() < -CONSTANTS.MOTOR_X_MAX_DEGREE:
             self.motor_x.track_target(-CONSTANTS.MOTOR_X_MAX_DEGREE)
 
+        log_data("balance_motor_x", self.motor_x.angle())
+        log_data("balance_motor_y", self.motor_y.angle())
         
         """
         Periodic update method called by the main controller loop.
@@ -61,7 +66,7 @@ class PlattformMotors:
         self.motor_x.track_target(angle * self.gear_ratio_x) # IMPORTANT: use track target, as it ensures no wiggle when small angle changes occur
 
     def move_y(self, angle):      
-        return
+        self.motor_y.track_target(angle * self.gear_ratio_x)
 
     def run_forever_x(self, speed):
         self.motor_x.run(speed)
@@ -77,20 +82,17 @@ class PlattformMotors:
         """
         self.motor_x.hold()
         self.motor_y.hold()
-
-    def get_angles(self):
-        return self.motor_x.angle(), self.motor_y.angle()
     
     def get_angle_x(self):
-        return self.motor_x.angle()
+        return self.motor_x.angle() / CONSTANTS.GEAR_RATIO_BALANCE_X
     
     def get_angle_y(self):
-        return self.motor_y.angle()
+        return self.motor_y.angle() / CONSTANTS.GEAR_RATIO_BALANCE_Y
     
     def track_target_y(self, angle, kp, ki, kd):
         error = angle - self.get_angle_y()
 
-        self.integral = 0.9 * self.integral + error
+        self.integral = 0.8 * self.integral + error
 
         derivative = error - self.last_error
         self.last_error = error

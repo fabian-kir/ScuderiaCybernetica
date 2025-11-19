@@ -22,15 +22,15 @@ class CONSTANTS:
     # ============================================================================
     # Proportional gain: angle correction per unit of reflection error
     # Higher values = faster response
-    PLATFORM_X_KP = -5
-    PLATFORM_Y_KP = 1
+    PLATFORM_X_KP = -2.5
+    PLATFORM_Y_KP = 6
 
     MOTOR_X_MAX_DEGREE = 80 # max rotation from calibration-0 
 
     # ============================================================================
     # Drive Motor PID Controller Configuration
     # ============================================================================
-    DRIVE_MOTOR_CONSTANT_POWER = 3 # in V
+    DRIVE_MOTOR_CONSTANT_POWER = 3 # in V MUSS 3 SEIN
 
     DRIVE_MOTOR_MIN_POWER = 10
 

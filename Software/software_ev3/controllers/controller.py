@@ -9,6 +9,7 @@ from hardware.ultrasonic_sensor import UltrasonicSensor
 from hardware.color_sensor import ColorSensor
 
 from controllers.platform_controller import PlatformController
+from utils.data_logger import log_data
 
 from pybricks.tools import StopWatch, wait
 import time
@@ -64,6 +65,7 @@ class Controller:
                     dt = .001
 
                 self.update(dt)
+                log_data("dt", dt)
                 
                 # Small sleep to prevent excessive CPU usage and allow UI to process
 
@@ -79,13 +81,13 @@ class Controller:
 
             self.color_sensor.calibrate_to_current_state()
 
+            # self.drive_motor.run_calibration()
+
             calibration_data.safe_to_file()
 
         calibration_data.load_from_file()
 
         self.color_sensor.load_calibration_data()
-
-        #self.drive_motor.run_calibration()
 
     def update(self, dt: float):
         """Periodic update logic."""
