@@ -19,7 +19,7 @@ class DriveMotor:
         self.target_speed = 0
 
         # Current power output (-100 to 100)
-        self._power = 0
+        self._dc = 0
 
         # PID controller
         self.base_resistance = 0 # loaded during calibration
@@ -36,23 +36,23 @@ class DriveMotor:
 
         self.past_resistances = []
 
-    def set_power(self, power):
+    def set_dc(self, power):
         if power == 0:
-            self._power = 0
+            self._dc = 0
             self.motor.hold()
             return
         
         elif 0 < abs(power) < CONSTANTS.DRIVE_MOTOR_MIN_POWER:
-            self._power = CONSTANTS.DRIVE_MOTOR_MIN_POWER
+            self._dc = CONSTANTS.DRIVE_MOTOR_MIN_POWER
         
         elif 0 > abs(power) > CONSTANTS.DRIVE_MOTOR_MIN_POWER:
-            self._power = -CONSTANTS.DRIVE_MOTOR_MIN_POWER
+            self._dc = -CONSTANTS.DRIVE_MOTOR_MIN_POWER
 
-        self._power = power
-        self.motor.dc(self._power)
+        self._dc = power
+        self.motor.dc(self._dc)
 
-    def get_power(self):
-        return self._power
+    def get_dc(self):
+        return self._dc
 
     def drive(self, speed):
         if speed == 0:
@@ -63,13 +63,17 @@ class DriveMotor:
 
     def update(self, dt):
         log_data("drive_motor_speed", self.motor.speed())
-        log_data("drive_motor_power", self.get_power())
+        log_data("drive_motor_power", self.get_dc())
         log_data("target_speed", self.target_speed)
 
         # self._pid_controller(dt) # currently not pid controlling speed
-        self.set_power(0) # TODO Change Back
 
-        # self._update_resistance()    
+        self.drive_at_constant_power(dt)
+        self._update_resistance()
+
+    def drive_at_constant_power(self, dt):
+        target_percent = CONSTANTS.DRIVE_MOTOR_CONSTANT_POWER / (RobotHub().get_battery_power())
+        self.set_power(target_percent * 100)
 
     def _pid_controller(self, dt):
         error = self.get_speed_error()
@@ -95,11 +99,11 @@ class DriveMotor:
         d = self.kd * derivative
         log_data("d", d)
 
-        self.set_power(p + i + d)
+        self.set_dc(p + i + d)
         self.previous_error = error
 
     def get_resistance(self):   
-        if self.get_power() == 0:
+        if self.get_dc() == 0:
             return 0
         
         n = CONSTANTS.DRIVE_MOTOR_RESISTANCES_AVERAGING_STEPS
@@ -107,16 +111,16 @@ class DriveMotor:
         if len(self.past_resistances) > 0:
             res = sum(self.past_resistances[-n:]) / n
         else:
-            res = self.motor.speed() / self.get_power()
+            res = self.motor.speed() / self.get_dc()
 
         return res - self.base_resistance
 
     def _update_resistance(self):
-        if self.get_power() == 0:
+        if self.get_dc() == 0:
             self.past_resistances = []
 
         '''Adds a new resistance measurement to the past measurements.'''
-        resistance = self.motor.speed() / self.get_power() # in (rad / s) / V
+        resistance = self.motor.speed() / self.get_dc() # in (rad / s) / V
         self.past_resistances.append(resistance)
 
     def get_speed_error(self):

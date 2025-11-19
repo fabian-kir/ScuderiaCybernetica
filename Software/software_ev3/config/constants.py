@@ -30,6 +30,8 @@ class CONSTANTS:
     # ============================================================================
     # Drive Motor PID Controller Configuration
     # ============================================================================
+    DRIVE_MOTOR_CONSTANT_POWER = 5 # in V
+
     DRIVE_MOTOR_MIN_POWER = 10
 
     # Proportional gain: power output per speed error
