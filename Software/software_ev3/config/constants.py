@@ -22,8 +22,10 @@ class CONSTANTS:
     # ============================================================================
     # Proportional gain: angle correction per unit of reflection error
     # Higher values = faster response
-    PLATFORM_X_KP = -2.5
-    PLATFORM_Y_KP = 6
+    PLATFORM_X_KP = -8
+    PLATFORM_Y_ULTRASONIC_KP = 0.7
+    PLATFORM_Y_ULTRASONIC_SPEED_KP = 4
+
 
     MOTOR_X_MAX_DEGREE = 80 # max rotation from calibration-0 
 

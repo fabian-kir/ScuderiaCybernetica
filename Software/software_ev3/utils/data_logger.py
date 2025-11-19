@@ -23,7 +23,7 @@ class DataLogger:
         logger.log_data(stream_name="motor_speed", value=45.5)
     """
 
-    def __init__(self, log_file="robot_data.csv", enabled=False):
+    def __init__(self, log_file="robot_data.csv", enabled=True):
         """
         Initialize the data logger.
 

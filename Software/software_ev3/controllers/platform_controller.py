@@ -2,6 +2,7 @@ from hardware.robot_hub import RobotHub
 from hardware.color_sensor import ColorSensor
 from hardware.plattform_motors import PlattformMotors
 from hardware.touch_sensors import TouchSensors
+from hardware.ultrasonic_sensor import UltrasonicSensor
 from config.constants import CONSTANTS
 
 from utils.data_logger import log_data
@@ -15,10 +16,14 @@ class PlatformController:
         self.color_sensor = ColorSensor()
         self.drive_motor = DriveMotor()
         self.plattform_motors = PlattformMotors()
+        self.touch_sensors = TouchSensors()
+        self.ultrasonic_sensor = UltrasonicSensor()
 
         self.time_since_beginning = 0
         self.time_until_controller_starts = 1
         self.controller_has_started = False
+
+        self.wall_hit_delay = 0
 
     def update(self, dt):
         if not self.time_since_beginning + dt > self.time_until_controller_starts:
@@ -40,15 +45,31 @@ class PlatformController:
         self.plattform_motors.run_forever_x(scaled_error)
 
     def control_y(self, dt):
-        slope_angle = self.drive_motor.get_slope_angle()
-        motor_angle = self.plattform_motors.get_angle_y()
+        soll_ultrasonic = CONSTANTS.PLATFORM_Y_ULTRASONIC_KP * self.ultrasonic_sensor.get_distance_error()
+        soll_drive_motor = self.drive_motor.get_slope_angle()
 
-        log_data("slope_angle", slope_angle)
-        log_data("motor_angle", motor_angle)
-        
-        self.plattform_motors.move_y(slope_angle)
+        avg_soll = (soll_ultrasonic + soll_drive_motor) / 2
 
-        #log_data("y-speed", error * CONSTANTS.PLATFORM_Y_KP)
-        #self.plattform_motors.run_forever_y(error * CONSTANTS.PLATFORM_Y_KP)
-        #self.plattform_motors.track_target_y(slope_angle, 11, 0, 0)
+        log_data("avg_soll", avg_soll)
 
+        if self.touch_sensors.is_any_pressed():
+            avg_soll = soll_ultrasonic
+
+        ist = self.plattform_motors.get_angle_y()
+
+        #soll = self.drive_motor.get_slope_angle()
+        #ist = self.plattform_motors.get_angle_y()
+
+        #log_data("drive_motor_detected_angle", soll)
+        log_data("small_balance_motor_angle", ist)
+
+        self.plattform_motors.run_forever_y( (avg_soll-ist)*CONSTANTS.PLATFORM_Y_ULTRASONIC_SPEED_KP)
+
+    def control_y_through_ultrasonic(self, dt):
+        soll = CONSTANTS.PLATFORM_Y_ULTRASONIC_KP * self.ultrasonic_sensor.get_distance_error() # this is already the relative error because the calibration in the beginning ensures it
+        ist = self.plattform_motors.get_angle_y()
+
+        #self.plattform_motors.move_y(scaled_error * CONSTANTS.PLATFORM_Y_ULTRASONIC_KP)
+
+        log_data("ultrasonic_detected_angle", soll)
+        self.plattform_motors.run_forever_y( (soll-ist)*CONSTANTS.PLATFORM_Y_ULTRASONIC_SPEED_KP )

@@ -14,8 +14,8 @@ class CalibrationData:
         with open(self.path_to_file, "r") as file:
             for line in file.readlines():
                 line = line.strip("")
-                #if line.startswith("ultrasound_sensor_target_distance"):
-                    #self.ultrasound_sensor_target_distance = float(line.split("=")[1])
+                if line.startswith("ultrasound_sensor_target_distance"):
+                    self.ultrasound_sensor_target_distance = float(line.split("=")[1])
                 if line.startswith("color_sensor_target_reflection"):
                     self.color_sensor_target_reflection = float(line.split("=")[1])
 
@@ -27,6 +27,7 @@ class CalibrationData:
 
         lines = [
             "color_sensor_target_reflection=" + str(self.color_sensor_target_reflection)+ "\n"
+            "ultrasound_sensor_target_distance=" + str(self.ultrasound_sensor_target_distance)
         ]
 
         text = ""

@@ -16,9 +16,14 @@ class TouchSensors:
         self.touch_sensor_left = TouchSensor(self.port_left)
         self.touch_sensor_right = TouchSensor(self.port_right)
 
+    def update(self, dt):
+        return
 
     def is_left_pressed(self):
         return self.touch_sensor_left.pressed()
         
     def is_right_pressed(self):
         return self.touch_sensor_right.pressed()
+    
+    def is_any_pressed(self):
+        return self.touch_sensor_left.pressed() or self.touch_sensor_right.pressed()
