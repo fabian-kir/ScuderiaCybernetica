@@ -79,7 +79,7 @@ class DriveMotor:
         log_data("p", p)
 
         # integral
-        if abs(self.motor.speed() < 5):
+        if abs(self.motor.speed()) < 5:
             # ensure motor doesn't overshoot so much when it was halted
             i = 0
             self.integral = 0
@@ -91,7 +91,7 @@ class DriveMotor:
 
 
         # derivative
-        derivative = (error * self.previous_error) / dt
+        derivative = (error - self.previous_error) / dt
         d = self.kd * derivative
         log_data("d", d)
 
@@ -103,7 +103,6 @@ class DriveMotor:
             return 0
         
         n = CONSTANTS.DRIVE_MOTOR_RESISTANCES_AVERAGING_STEPS
-
         res = 0
         if len(self.past_resistances) > 0:
             res = sum(self.past_resistances[-n:]) / n
