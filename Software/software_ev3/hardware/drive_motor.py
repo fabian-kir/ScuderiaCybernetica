@@ -68,7 +68,7 @@ class DriveMotor:
 
         self._pid_controller(dt)
 
-        self._update_resistance        
+        self._update_resistance()    
         RobotHub().print("drive_motor_resistance:", self.get_resistance())
 
     def _pid_controller(self, dt):
@@ -98,15 +98,15 @@ class DriveMotor:
         self.set_power(p + i + d)
         self.previous_error = error
 
-    def get_resistance(self, n=5):   
-        if self.get_power == 0:
+    def get_resistance(self):   
+        if self.get_power() == 0:
             return 0
         
         n = CONSTANTS.DRIVE_MOTOR_RESISTANCES_AVERAGING_STEPS
 
         res = 0
         if len(self.past_resistances) > 0:
-            res = sum(self.past_resistances[:n]) / n
+            res = sum(self.past_resistances[-n:]) / n
         else:
             res = self.motor.speed() / self.get_power()
 

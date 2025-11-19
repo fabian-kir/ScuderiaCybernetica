@@ -6,7 +6,7 @@ Constants are organized by subsystem for better maintainability.
 """
 
 class CONSTANTS:
-    RUN_NEW_CALIBRATION = True # set this to false to use the stored calibration data of the last run
+    RUN_NEW_CALIBRATION = False # set this to false to use the stored calibration data of the last run
     PATH_TO_CALIBRATION_DATA = "config/calibration_data.txt"
 
     # ============================================================================

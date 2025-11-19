@@ -46,7 +46,7 @@ class Controller:
         """Main control loop with delta timing using Pybricks StopWatch."""
         
         # Values for testing
-        self.drive_motor.drive(300)
+        self.drive_motor.drive(700)
 
         # Main Loop
         self.running = True
