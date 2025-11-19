@@ -40,6 +40,13 @@ class PlattformMotors:
         RobotHub().print("Set up balance motors x and y on ports:", self.port_x, self.port_y)
 
     def update(self, dt):
+        if self.motor_x.angle() > CONSTANTS.MOTOR_X_MAX_DEGREE:
+            self.motor_x.track_target(CONSTANTS.MOTOR_X_MAX_DEGREE)
+
+        elif self.motor_x.angle() < -CONSTANTS.MOTOR_X_MAX_DEGREE:
+            self.motor_x.track_target(-CONSTANTS.MOTOR_X_MAX_DEGREE)
+
+
         """
         Periodic update method called by the main controller loop.
         
