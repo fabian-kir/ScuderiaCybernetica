@@ -7,7 +7,7 @@ Constants are organized by subsystem for better maintainability.
 
 class CONSTANTS:
     RUN_NEW_CALIBRATION = True # set this to false to use the stored calibration data of the last run
-    PATH_TO_CALIBRATION_DATA = "config/calibration_data.txt"
+    PATH_TO_CALIBRATION_DATA = "config/calibration_data_0deg.txt"
 
     # ============================================================================
     # Platform/Balance Motor Configuration
@@ -30,7 +30,7 @@ class CONSTANTS:
     # ============================================================================
     # Drive Motor PID Controller Configuration
     # ============================================================================
-    DRIVE_MOTOR_CONSTANT_POWER = 5 # in V
+    DRIVE_MOTOR_CONSTANT_POWER = 3 # in V
 
     DRIVE_MOTOR_MIN_POWER = 10
 
@@ -51,3 +51,6 @@ class CONSTANTS:
     # K_d 0 → 1 Typically smallest; helps stabilize oscillations. Start with 0 and add only if needed.
 
     DRIVE_MOTOR_RESISTANCES_AVERAGING_STEPS = 20 # how many cycles the output of get_resistance will be averaged accross
+
+    # AT 3V
+    SLOPE_SPEED_ARRAY = [(421.78, -20), (400.00, -15), (379.1, -10), (346.46, -5), (296.6, 0), (250.76, 5), (210.64, 10), (165.38, 15), (102.34, 20)]

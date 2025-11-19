@@ -66,7 +66,6 @@ class Controller:
                 self.update(dt)
                 
                 # Small sleep to prevent excessive CPU usage and allow UI to process
-                time.sleep(0.001)  # 1ms sleep
 
         except KeyboardInterrupt:
             self.stop()
@@ -79,16 +78,14 @@ class Controller:
             hub.await_user_confirmation("Set Plattform even, set motor on a flat road, then press middle button to calibrate.")
 
             self.color_sensor.calibrate_to_current_state()
-            #self.ultrasonic_sensor.calibrate_to_current_state()
-            self.drive_motor.calibrate_to_current_state()
 
             calibration_data.safe_to_file()
 
         calibration_data.load_from_file()
 
         self.color_sensor.load_calibration_data()
-        #self.ultrasonic_sensor.load_calibration_data()
-        self.drive_motor.load_calibration_data()
+
+        self.drive_motor.run_calibration()
 
     def update(self, dt: float):
         """Periodic update logic."""

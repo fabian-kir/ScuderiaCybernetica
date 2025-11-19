@@ -63,6 +63,9 @@ class PlattformMotors:
     def run_forever_x(self, speed):
         self.motor_x.run(speed)
 
+    def run_forever_y(self, speed):
+        self.motor_y.run(speed)
+
     def hold(self):
         """
         Hold both motors at their current positions.

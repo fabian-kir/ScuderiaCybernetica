@@ -18,8 +18,6 @@ class CalibrationData:
                     #self.ultrasound_sensor_target_distance = float(line.split("=")[1])
                 if line.startswith("color_sensor_target_reflection"):
                     self.color_sensor_target_reflection = float(line.split("=")[1])
-                elif line.startswith("drive_motor_base_resistance"):
-                    self.drive_motor_base_resistance = float(line.split("=")[1])
 
     def safe_to_file(self):
         if self.drive_motor_base_resistance is None:
@@ -29,7 +27,6 @@ class CalibrationData:
 
         lines = [
             "color_sensor_target_reflection=" + str(self.color_sensor_target_reflection)+ "\n"
-            "drive_motor_base_resistance=" + str(self.drive_motor_base_resistance) + "\n"
         ]
 
         text = ""
