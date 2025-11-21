@@ -4,6 +4,7 @@ from hardware.plattform_motors import PlattformMotors
 from hardware.touch_sensors import TouchSensors
 from hardware.ultrasonic_sensor import UltrasonicSensor
 from config.constants import CONSTANTS
+from pybricks.tools import StopWatch, wait
 
 from utils.data_logger import log_data
 
@@ -13,6 +14,7 @@ from hardware.drive_motor import DriveMotor
 class PlatformController:
     def __init__(self):
         # Initialize sensors and motors
+        self.hub = RobotHub()
         self.color_sensor = ColorSensor()
         self.drive_motor = DriveMotor()
         self.plattform_motors = PlattformMotors()
@@ -22,7 +24,7 @@ class PlatformController:
         self.time_since_beginning = 0
         self.time_until_controller_starts = 1
         self.controller_has_started = False
-
+        self.watch = StopWatch()
         self.wall_hit_delay = 0
 
     def update(self, dt):
@@ -42,18 +44,27 @@ class PlatformController:
         scaled_error = error * CONSTANTS.PLATFORM_X_KP
 
         log_data("balance_motor_x_speed", scaled_error)
+
+        scaled_error = max(min(scaled_error, CONSTANTS.PLATFORM_X_MAX_SPEED), -CONSTANTS.PLATFORM_X_MAX_SPEED)
         self.plattform_motors.run_forever_x(scaled_error)
 
     def control_y(self, dt):
         soll_ultrasonic = CONSTANTS.PLATFORM_Y_ULTRASONIC_KP * self.ultrasonic_sensor.get_distance_error()
         soll_drive_motor = self.drive_motor.get_slope_angle()
 
-        avg_soll = (soll_ultrasonic + soll_drive_motor) / 2
+        avg_soll =  (soll_drive_motor + soll_ultrasonic)/2
 
         log_data("avg_soll", avg_soll)
 
+        """
         if self.touch_sensors.is_any_pressed():
+            self.watch.reset()
+            # RobotHub().beep()
             avg_soll = soll_ultrasonic
+        elif self.watch.time() < 2000:
+            # RobotHub().beep()
+            avg_soll = soll_ultrasonic
+        """
 
         ist = self.plattform_motors.get_angle_y()
 

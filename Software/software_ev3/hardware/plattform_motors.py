@@ -30,7 +30,7 @@ class PlattformMotors:
         self.gear_ratio_x = CONSTANTS.GEAR_RATIO_BALANCE_X
         self.gear_ratio_y = CONSTANTS.GEAR_RATIO_BALANCE_Y
 
-        self.motor_x = Motor(self.port_x, gears=[self.gear_ratio_x])
+        self.motor_x = Motor(self.port_x, gears=[self.gear_ratio_x, ])
         # self.motor_y = Motor(self.port_y, gears=[12, 20])
         self.motor_y = Motor(self.port_y)
 

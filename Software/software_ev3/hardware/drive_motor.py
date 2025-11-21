@@ -35,7 +35,7 @@ class DriveMotor:
         self.integral = 0.0
         self.previous_error = 0.0
 
-        self.interpolation = InterpolationFromArray(array=CONSTANTS.SLOPE_SPEED_ARRAY)
+        self.interpolation = InterpolationFromArray(array=CONSTANTS.SLOPE_SPEED_ARRAY_3V)
 
     def set_dc(self, power):
         if power == 0:

@@ -22,8 +22,10 @@ class CONSTANTS:
     # ============================================================================
     # Proportional gain: angle correction per unit of reflection error
     # Higher values = faster response
-    PLATFORM_X_KP = -8
-    PLATFORM_Y_ULTRASONIC_KP = 0.7
+    PLATFORM_X_KP = -10
+    PLATFORM_X_MAX_SPEED = 100
+
+    PLATFORM_Y_ULTRASONIC_KP = 0.6
     PLATFORM_Y_ULTRASONIC_SPEED_KP = 4
 
 
@@ -32,7 +34,7 @@ class CONSTANTS:
     # ============================================================================
     # Drive Motor PID Controller Configuration
     # ============================================================================
-    DRIVE_MOTOR_CONSTANT_POWER = 3 # in V MUSS 3 SEIN
+    DRIVE_MOTOR_CONSTANT_POWER = 3.5 # in V MUSS 3 SEIN
 
     DRIVE_MOTOR_MIN_POWER = 10
 
@@ -55,5 +57,7 @@ class CONSTANTS:
     DRIVE_MOTOR_RESISTANCES_AVERAGING_STEPS = 20 # how many cycles the output of get_resistance will be averaged accross
 
     # AT 3V
-    SLOPE_SPEED_ARRAY = [(410.48, -20), (389.88, -15), (364.92, -10), (334.34, -5), (300.00, 0), (267, 5), (218.92, 10), (171.84, 15), (112.92, 20)]
+    SLOPE_SPEED_ARRAY_3V = [(410.48, -20), (389.88, -15), (364.92, -10), (334.34, -5), (300.00, 0), (267, 5), (218.92, 10), (171.84, 15), (112.92, 20)]
     
+    # At 2V
+    SLOPE_SPEED_ARRAY_2V = [( 296, -20) , ( 268, -15) , ( 241, -10) , (210 , -5) , (170 , 0), (126 , 5) , (75 , 10) , ( 0, 15) , ( 0, 20)]
