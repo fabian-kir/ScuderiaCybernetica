@@ -1,3 +1,0 @@
-- [] measure Base Resistance and set it constants["DRIVE_MOTOR_BASE_RESISTANCE"]
-- [] test for best kslope for drive motor
-- [] test for best kp, ki, kd-values for all controllers and set it in constants

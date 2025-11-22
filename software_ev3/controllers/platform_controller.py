@@ -1,6 +1,6 @@
 from hardware.robot_hub import RobotHub
 from hardware.color_sensor import ColorSensor
-from hardware.plattform_motors import PlattformMotors
+from hardware.platform_motors import PlatformMotors
 from hardware.touch_sensors import TouchSensors
 from hardware.ultrasonic_sensor import UltrasonicSensor
 from config.constants import CONSTANTS
@@ -10,6 +10,40 @@ from utils.data_logger import log_data
 
 from hardware.drive_motor import DriveMotor
 
+
+class PlatformController:
+    def __init__(self):
+        self.hub = RobotHub()
+        self.color_sensor = ColorSensor()
+        self.drive_motor = DriveMotor()
+        self.platform_motors = PlatformMotors()
+        self.touch_sensors = TouchSensors()
+        self.ultrasonic_sensor = UltrasonicSensor()
+
+        self.time_since_startup = 0
+
+    def update(self, dt):
+        if not self.controller_ready(dt):
+            return
+
+        self.sideways_proportional_speed_control(dt)
+        self.forward_proportional_speed_control(dt)
+
+    def sideways_proportional_speed_control(self, dt):
+        error = self.color_sensor.get_reflection_error()
+        self.platform_motors.sideways_set_speed(error * CONSTANTS.PLATFORM_SIDEWAYS_SPEED_KP)
+
+    def forward_proportional_speed_control(self, dt):
+        slope_soll = self.drive_motor.get_slope()
+        slope_ist = self.platform_motors.forward_get_angle()
+        error = slope_soll - slope_ist
+        self.platform_motors.forward_set_speed(error * CONSTANTS.PLATFORM_FORWARD_SPEED_KP)
+
+    def controller_ready(self, dt):
+        self.time_since_startup += dt
+        if self.time_since_startup >= CONSTANTS.TIME_UNTIL_PLATFORM_CONTROLLER_STARTS:
+            return True
+        return False
 
 class PlatformController:
     def __init__(self):
@@ -50,7 +84,7 @@ class PlatformController:
 
     def control_y(self, dt):
         soll_ultrasonic = CONSTANTS.PLATFORM_Y_ULTRASONIC_KP * self.ultrasonic_sensor.get_distance_error()
-        soll_drive_motor = self.drive_motor.get_slope_angle()
+        soll_drive_motor = self.drive_motor.get_slope()
 
         avg_soll =  (soll_drive_motor + soll_ultrasonic)/2
 

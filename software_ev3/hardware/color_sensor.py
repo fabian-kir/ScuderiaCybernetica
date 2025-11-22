@@ -15,36 +15,29 @@ class ColorSensor:
 
         RobotHub().print("Set up color sensor on port:", self.port)
 
-        self._last_reflections = []
-
     def update(self, dt):
         log_data("color_sensor", self.get_reflection_error())
-        self._last_reflections.append(self.get_absolute_reflection())
 
     def get_reflection_error(self, smoothed_for_iterations=5):
         """
         Returns the difference between the current reflection and the target.
         """
+        current_reflection = self.get_reflection()
+        return self.target_reflection - current_reflection
 
-        # smoothing the output so it's averaged across the last iterations in order to get less jiggle in the motor
-        current_reflection = self.sensor.reflection()
-        if smoothed_for_iterations > 0 and len(self._last_reflections) >= smoothed_for_iterations:
-            current_reflection = int(sum(self._last_reflections[:smoothed_for_iterations]) / smoothed_for_iterations)
-
-        return self.target_reflection - self.sensor.reflection()
-
-    def get_absolute_reflection(self):
+    def get_reflection(self):
         return self.sensor.reflection()
 
-    def calibrate_to_current_state(self):
+    def save_calibration(self):
         from utils.calibration_data import calibration_data
 
-        self.target_reflection = self.get_absolute_reflection()
-        calibration_data.color_sensor_target_reflection = self.target_reflection
+        reflection = self.get_reflection()
+
+        calibration_data.set("color_sensor_target_reflection", reflection)
         RobotHub().print("Calibrated color sensor to current state.")
 
-    def load_calibration_data(self):
+    def load_calibration(self):
         from utils.calibration_data import calibration_data
 
-        self.target_reflection = calibration_data.color_sensor_target_reflection
+        self.target_reflection = calibration_data.get("color_sensor_target_reflection")
         RobotHub().print("loaded color sensor target reflection to:", self.target_reflection)

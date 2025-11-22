@@ -13,15 +13,27 @@ class UltrasonicSensor:
         self.sensor = PybricksUltrasonicSensor(self.port)
 
         self.last_stable_distance = 0
-
-        self.target_distance = 0.0
+        self.target_distance = 0
 
         RobotHub().print("Set up ultrasonic sensor on port:", self.port)
 
-    def calibrate_to_current_state(self):
+    def save_calibration(self):
         from utils.calibration_data import calibration_data
 
-        self.target_distance = self.get_absolute_distance()
+        target_distance = 0
+
+        for i in range(5):
+            target_distance = self.get_distance()
+
+            if self.target_distance > 0:
+                break
+
+        else:
+            raise Exception("Could not calibrate ultrasonic sensor.")
+
+
+        if self.target_distance == 0:
+
         calibration_data.ultrasound_sensor_target_distance = self.target_distance
         RobotHub().print("Calibrated ultrasonic sensor to current state.")
 
@@ -32,7 +44,7 @@ class UltrasonicSensor:
         """Returns the difference between the current distance and the target."""
         return self.target_distance - self.get_absolute_distance()
 
-    def get_absolute_distance(self):
+    def get_distance(self):
         distance = self.sensor.distance()
         if distance > 1000:
             return self.last_stable_distance

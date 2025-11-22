@@ -11,6 +11,7 @@ from pybricks.tools import StopWatch
 from utils.singleton import singleton
 
 from hardware.robot_hub import RobotHub
+from csv_file_handler import CSVFileHandler
 
 
 @singleton
@@ -43,19 +44,19 @@ class DataLogger:
     def _file_exists(self):
         """Check if the log file exists (MicroPython compatible)."""
         try:
-            f = open(self.log_file, 'w')
+            f = open(self.log_file, 'r')
             f.close()
             return True
         except OSError:
-            RobotHub().print("OS Error when trying to initialize log file")
+            return False
 
     def _format_csv_row(self, values):
         """
         Format a list of values as a CSV row.
-        
+
         Args:
             values: List of values to format
-            
+
         Returns:
             str: CSV-formatted row string
         """
@@ -76,17 +77,15 @@ class DataLogger:
 
         # Check if file exists and needs header
         file_needs_header = not self._file_exists()
-        
+
         # Open file in append mode (MicroPython compatible)
         try:
-            self._file_handle = open(self.log_file, 'a')
-            
+            self._file_handle = CSVFileHandler(self.log_file, mode='a').__enter__()
+
             # Write header if file is new
             if file_needs_header:
-                header = self._format_csv_row(['stream_name', 'time', 'value'])
-                self._file_handle.write(header + '\n')
-                self._file_handle.flush()
-            
+                self._file_handle.write_row(['stream_name', 'time', 'value'])
+
             self._file_initialized = True
         except Exception:
             RobotHub().print("Error opening log file:", self.log_file)
@@ -117,13 +116,7 @@ class DataLogger:
         try:
 
             # Format and write data row: stream_name, time, value
-            row = self._format_csv_row([
-                stream_name,
-                time,
-                value
-            ])
-            self._file_handle.write(row + '\n')
-            self._file_handle.flush()  # Ensure data is written immediately
+            self._file_handle.write_row([stream_name, time, value])
 
         except Exception:
             # Silently fail to avoid disrupting robot operation
@@ -131,7 +124,7 @@ class DataLogger:
             RobotHub().print("Error logging data to file")
             if self._file_handle:
                 try:
-                    self._file_handle.close()
+                    self._file_handle.__exit__(None, None, None)
                 except Exception:
                     pass
                 self._file_handle = None
@@ -141,7 +134,7 @@ class DataLogger:
         """Close the log file. Call this when done logging."""
         if self._file_handle:
             try:
-                self._file_handle.close()
+                self._file_handle.__exit__(None, None, None)
             except Exception:
                 pass
             self._file_handle = None
@@ -181,4 +174,3 @@ def log_data(stream_name, value):
     if _logger_instance is None:
         _logger_instance = DataLogger()
     _logger_instance.log_data(stream_name, value)
-
