@@ -1,11 +1,11 @@
-from config.ports import PORTS
+from software_ev3.config.ports import PORTS
 from pybricks.ev3devices import TouchSensor
 from pybricks.parameters import Stop
 
-from utils.singleton import singleton
-from config.constants import CONSTANTS
+from software_ev3.utils.singleton import singleton
+from software_ev3.config.constants import CONSTANTS
 
-from hardware.robot_hub import RobotHub
+from software_ev3.hardware.robot_hub import RobotHub
 
 @singleton
 class TouchSensors:

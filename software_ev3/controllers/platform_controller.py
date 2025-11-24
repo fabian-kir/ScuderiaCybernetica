@@ -1,14 +1,14 @@
-from hardware.robot_hub import RobotHub
-from hardware.color_sensor import ColorSensor
-from hardware.platform_motors import PlatformMotors
-from hardware.touch_sensors import TouchSensors
-from hardware.ultrasonic_sensor import UltrasonicSensor
-from config.constants import CONSTANTS
+from software_ev3.hardware.robot_hub import RobotHub
+from software_ev3.hardware.color_sensor import ColorSensor
+from software_ev3.hardware.platform_motors import PlatformMotors
+from software_ev3.hardware.touch_sensors import TouchSensors
+from software_ev3.hardware.ultrasonic_sensor import UltrasonicSensor
+from software_ev3.config.constants import CONSTANTS
 from pybricks.tools import StopWatch, wait
 
-from utils.data_logger import log_data
+from software_ev3.utils.data_logger import log_data
 
-from hardware.drive_motor import DriveMotor
+from software_ev3.hardware.drive_motor import DriveMotor
 
 
 class PlatformController:

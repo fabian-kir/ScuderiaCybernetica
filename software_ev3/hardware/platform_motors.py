@@ -1,14 +1,14 @@
-from config.ports import PORTS
+from software_ev3.config.ports import PORTS
 from pybricks.ev3devices import Motor
 
-from utils.data_logger import log_data
-from utils.singleton import singleton
+from software_ev3.utils.data_logger import log_data
+from software_ev3.utils.singleton import singleton
 
-from config.constants import CONSTANTS
+from software_ev3.config.constants import CONSTANTS
 
-from hardware.robot_hub import RobotHub
+from software_ev3.hardware.robot_hub import RobotHub
 
-from exceptions import MotorControlException
+from software_ev3.exceptions import MotorControlException
 
 
 @singleton
@@ -26,8 +26,8 @@ class PlatformMotors:
         self.port_forward = PORTS["LARGE_BALANCE_MOTOR"]
         self.port_sideways = PORTS["SMALL_BALANCE_MOTOR"]
 
-        self.motor_forward = Motor(self.port_forward, gears=[CONSTANTS.GEAR_RATIO_BALANCE_X])
-        self.motor_sideways = Motor(self.port_sideways, gears=[CONSTANTS.GEAR_RATIO_BALANCE_Y])
+        self.motor_forward = Motor(self.port_forward, gears=[CONSTANTS.GEAR_RATIO_PLATFORM_FORWARD, ])
+        self.motor_sideways = Motor(self.port_sideways, gears=[CONSTANTS.GEAR_RATIO_PLATFORM_SIDEWAYS, ])
 
         self.motor_forward.reset_angle(0)
         self.motor_sideways.reset_angle(0)

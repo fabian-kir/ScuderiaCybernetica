@@ -1,9 +1,9 @@
-from config.ports import PORTS
+from software_ev3.config.ports import PORTS
 from pybricks.ev3devices import ColorSensor as PybricksColorSensor
 
-from utils.singleton import singleton
-from utils.data_logger import log_data
-from hardware.robot_hub import RobotHub
+from software_ev3.utils.singleton import singleton
+from software_ev3.utils.data_logger import log_data
+from software_ev3.hardware.robot_hub import RobotHub
 
 @singleton
 class ColorSensor:

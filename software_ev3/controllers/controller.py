@@ -1,18 +1,18 @@
 import os
 
-from utils.singleton import singleton
-from utils.data_logger import log_data
+from software_ev3.utils.singleton import singleton
+from software_ev3.utils.data_logger import log_data
 
-from hardware.plattform_motors import PlattformMotors
-from hardware.robot_hub import RobotHub
-from hardware.drive_motor import DriveMotor
-from hardware.ultrasonic_sensor import UltrasonicSensor
-from hardware.color_sensor import ColorSensor
-from hardware.touch_sensors import TouchSensors
+from software_ev3.hardware.platform_motors import PlatformMotors
+from software_ev3.hardware.robot_hub import RobotHub
+from software_ev3.hardware.drive_motor import DriveMotor
+from software_ev3.hardware.ultrasonic_sensor import UltrasonicSensor
+from software_ev3.hardware.color_sensor import ColorSensor
+from software_ev3.hardware.touch_sensors import TouchSensors
 
-from controllers.platform_controller import PlatformController
+from software_ev3.controllers.platform_controller import PlatformController
 
-from config.constants import CONSTANTS
+from software_ev3.config.constants import CONSTANTS
 
 from pybricks.tools import StopWatch, wait
 
@@ -22,7 +22,7 @@ class Controller:
     def __init__(self):
         # HARDWARE WRAPPERS
         self.hub = RobotHub()
-        self.plattform_motors = PlattformMotors()
+        self.plattform_motors = PlatformMotors()
         self.drive_motor = DriveMotor()
         self.ultrasonic_sensor = UltrasonicSensor()
         self.color_sensor = ColorSensor()

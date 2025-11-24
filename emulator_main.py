@@ -16,10 +16,6 @@ from emulator_pybricks.runtime import launch_emulator
 from software_ev3.controllers.controller import Controller
 from software_ev3.hardware.robot_hub import RobotHub
 
-# On the EV3 firmware this method exists, but add a fallback for host mode.
-if not hasattr(RobotHub, "get_battery_voltage"):
-    RobotHub.get_battery_voltage = RobotHub.get_battery_power
-
 def main():
     """Entry-point that spins up the emulator UI and robot controller."""
 

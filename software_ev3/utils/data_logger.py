@@ -8,10 +8,10 @@ Data is saved in CSV format for easy parsing and plotting later.
 from time import time
 
 from pybricks.tools import StopWatch
-from utils.singleton import singleton
+from software_ev3.utils.singleton import singleton
 
-from hardware.robot_hub import RobotHub
-from csv_file_handler import CSVFileHandler
+from software_ev3.hardware.robot_hub import RobotHub
+from software_ev3.utils.csv_file_handler import CSVFileHandler
 
 
 @singleton

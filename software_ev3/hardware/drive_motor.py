@@ -1,16 +1,16 @@
-from config.ports import PORTS
-from config.constants import CONSTANTS
+from software_ev3.config.ports import PORTS
+from software_ev3.config.constants import CONSTANTS
 from pybricks.ev3devices import Motor
 
-from hardware.robot_hub import RobotHub
+from software_ev3.hardware.robot_hub import RobotHub
 
-from exceptions import MotorControlException
+from software_ev3.exceptions import MotorControlException
 
-from utils.controllers import PIDController
-from utils.singleton import singleton
-from utils.data_logger import log_data
-from utils.interpolation_from_array import Interpolation2DFromArray
-from utils.csv_file_handler import CSVFileHandler
+from software_ev3.utils.controllers import PIDController
+from software_ev3.utils.singleton import singleton
+from software_ev3.utils.data_logger import log_data
+from software_ev3.utils.interpolation_from_array import Interpolation2DFromArray
+from software_ev3.utils.csv_file_handler import CSVFileHandler
 
 
 @singleton
@@ -127,7 +127,7 @@ class DriveMotor:
             csv.write_dict(res)
 
     def load_slope_calibration(self):
-        from utils.csv_file_handler import CSVFileHandler
+        from software_ev3.utils.csv_file_handler import CSVFileHandler
 
         with CSVFileHandler(CONSTANTS.DRIVE_MOTOR_SLOPE_CALIBRATION_CSV_PATH) as csv:
             self.interpolation = Interpolation2DFromArray(csv.read_dict())

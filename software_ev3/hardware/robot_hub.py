@@ -4,7 +4,7 @@ from pybricks.media.ev3dev import SoundFile
 from pybricks.media.ev3dev import Font
 import time
 
-from utils.singleton import singleton
+from software_ev3.utils.singleton import singleton
 
 # Import UI event processor for emulator mode
 try:
