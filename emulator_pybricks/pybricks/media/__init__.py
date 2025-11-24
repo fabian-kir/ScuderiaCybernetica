@@ -1,3 +1,2 @@
-# Package marker for media submodule
-
+__all__ = ["ev3dev"]
 

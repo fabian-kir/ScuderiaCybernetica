@@ -1,33 +1,40 @@
 import time
-import os
 
-def wait(ms: int) -> None:
-	"""Block for the given milliseconds."""
-	# In emulator mode, periodically process UI events to keep window responsive
-	if os.environ.get("EV3_EMULATOR", "0") in ("1", "true", "True", "yes", "YES"):
-		from .ui import process_ui_events
-		# Process events in small chunks to keep UI responsive
-		elapsed = 0
-		chunk_ms = 10  # Process events every 10ms
-		while elapsed < ms:
-			time.sleep(min(chunk_ms / 1000.0, (ms - elapsed) / 1000.0))
-			elapsed += chunk_ms
-			try:
-				process_ui_events()
-			except Exception:
-				# Window closed or error, fall back to normal sleep
-				time.sleep((ms - elapsed) / 1000.0)
-				break
-	else:
-		time.sleep(ms / 1000.0)
+__all__ = ["StopWatch", "wait"]
 
 
 class StopWatch:
-	def __init__(self) -> None:
-		self._start = time.perf_counter()
+    """Simplified StopWatch compatible with the Pybricks API."""
 
-	def time(self) -> int:
-		"""Elapsed time in milliseconds."""
-		return int((time.perf_counter() - self._start) * 1000)
+    def __init__(self):
+        self.reset()
 
+    def reset(self) -> None:
+        self._start = time.monotonic()
+        self._paused = False
+        self._pause_start = None
+        self._pause_offset = 0.0
+
+    def time(self) -> int:
+        if self._paused and self._pause_start is not None:
+            elapsed = self._pause_start - self._start - self._pause_offset
+        else:
+            elapsed = time.monotonic() - self._start - self._pause_offset
+        return int(elapsed * 1000)
+
+    def pause(self) -> None:
+        if not self._paused:
+            self._pause_start = time.monotonic()
+            self._paused = True
+
+    def resume(self) -> None:
+        if self._paused and self._pause_start is not None:
+            self._pause_offset += time.monotonic() - self._pause_start
+            self._pause_start = None
+            self._paused = False
+
+
+def wait(duration_ms: int) -> None:
+    """Blocking wait expressed in milliseconds to match Pybricks semantics."""
+    time.sleep(duration_ms / 1000.0)
 

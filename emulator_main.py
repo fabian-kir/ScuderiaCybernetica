@@ -12,12 +12,22 @@ emulator_root = software_root / "emulator_pybricks"
 if str(emulator_root) not in sys.path:
     sys.path.insert(0, str(emulator_root))
 
+from emulator_pybricks.runtime import launch_emulator
 from software_ev3.controllers.controller import Controller
+from software_ev3.hardware.robot_hub import RobotHub
+
+# On the EV3 firmware this method exists, but add a fallback for host mode.
+if not hasattr(RobotHub, "get_battery_voltage"):
+    RobotHub.get_battery_voltage = RobotHub.get_battery_power
 
 def main():
-	# Create controller and start behavior
-	controller = Controller()
-	controller.run()
+    """Entry-point that spins up the emulator UI and robot controller."""
+
+    def run_robot():
+        controller = Controller()
+        controller.run()
+
+    launch_emulator(run_robot)
 
 if __name__ == "__main__":
     main()

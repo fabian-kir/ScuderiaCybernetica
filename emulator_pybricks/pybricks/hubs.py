@@ -1,59 +1,82 @@
-from .state import EMU_STATE
-from .ui import ensure_ui_started
-from .parameters import Button
+from __future__ import annotations
 
+from typing import Tuple
 
-class _Screen:
-	def clear(self):
-		# No persistent buffer in emulator
-		return
+from emulator_pybricks.runtime import EmulatorRuntime, get_runtime
 
-	def print(self, *args):
-		# Print to host console
-		print("[EV3 SCREEN]", *args)
-
-	def draw_text(self, x, y, text):
-		# Print to host console with position info
-		print(f"[EV3 SCREEN] ({x},{y}): {text}")
-
-
-class _Speaker:
-	def beep(self):
-		print("[EV3 SPEAKER] beep")
-
-	def play_file(self, soundfile):
-		print(f"[EV3 SPEAKER] play {soundfile}")
-
-
-class _Light:
-	def on(self, color):
-		print(f"[EV3 LIGHT] {color}")
-
-
-class _Buttons:
-	def pressed(self):
-		pressed_buttons = []
-		for button_name in EMU_STATE.get_pressed_buttons():
-			# Map button names to Button enum values
-			if button_name == "LEFT":
-				pressed_buttons.append(Button.LEFT)
-			elif button_name == "RIGHT":
-				pressed_buttons.append(Button.RIGHT)
-			elif button_name == "UP":
-				pressed_buttons.append(Button.UP)
-			elif button_name == "DOWN":
-				pressed_buttons.append(Button.DOWN)
-			elif button_name == "CENTER":
-				pressed_buttons.append(Button.CENTER)
-		return pressed_buttons
+__all__ = ["EV3Brick"]
 
 
 class EV3Brick:
-	def __init__(self):
-		ensure_ui_started()
-		self.screen = _Screen()
-		self.speaker = _Speaker()
-		self.light = _Light()
-		self.buttons = _Buttons()
+    """Very small EV3 hub façade backed by the emulator runtime."""
 
+    def __init__(self):
+        self._runtime = get_runtime()
+        self.screen = _Screen(self._runtime)
+        self.speaker = _Speaker(self._runtime)
+        self.buttons = _Buttons(self._runtime)
+        self.light = _Light(self._runtime)
+        self.battery = _Battery(self._runtime)
+
+
+class _Screen:
+    def __init__(self, runtime: EmulatorRuntime):
+        self._runtime = runtime
+        self._font = None
+
+    def set_font(self, font) -> None:
+        self._font = font
+        self._runtime.append_console(f"Screen font set to {font}", level="debug")
+
+    def clear(self) -> None:
+        self._runtime.append_console("Screen cleared", level="debug")
+
+    def print(self, *args) -> None:
+        text = " ".join(str(arg) for arg in args)
+        self._runtime.append_console(f"SCREEN: {text}")
+
+    def draw_text(self, x: int, y: int, text: str) -> None:
+        self._runtime.append_console(f"Screen draw at ({x}, {y}): {text}")
+
+
+class _Speaker:
+    def __init__(self, runtime: EmulatorRuntime):
+        self._runtime = runtime
+
+    def beep(self) -> None:
+        self._runtime.append_console("Speaker beep")
+
+    def play_file(self, sound_file) -> None:
+        self._runtime.append_console(f"Speaker play: {sound_file}")
+
+
+class _Buttons:
+    def __init__(self, runtime: EmulatorRuntime):
+        self._runtime = runtime
+
+    def pressed(self) -> Tuple:
+        return self._runtime.get_pressed_buttons()
+
+
+class _Light:
+    def __init__(self, runtime: EmulatorRuntime):
+        self._runtime = runtime
+        self._color = None
+
+    def on(self, color) -> None:
+        self._color = color
+        self._runtime.append_console(f"LED color set to {color}")
+
+    def off(self) -> None:
+        self._color = None
+        self._runtime.append_console("LED turned off")
+
+
+class _Battery:
+    def __init__(self, runtime: EmulatorRuntime):
+        self._runtime = runtime
+
+    def voltage(self) -> int:
+        """Return current voltage in mV to match Pybricks."""
+        return self._runtime.get_battery_voltage_mv()
 
