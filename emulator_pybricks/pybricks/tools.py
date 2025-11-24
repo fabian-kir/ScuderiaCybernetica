@@ -1,33 +1,82 @@
-import time
-import os
+"""
+Pybricks tools module emulation
 
-def wait(ms: int) -> None:
-	"""Block for the given milliseconds."""
-	# In emulator mode, periodically process UI events to keep window responsive
-	if os.environ.get("EV3_EMULATOR", "0") in ("1", "true", "True", "yes", "YES"):
-		from .ui import process_ui_events
-		# Process events in small chunks to keep UI responsive
-		elapsed = 0
-		chunk_ms = 10  # Process events every 10ms
-		while elapsed < ms:
-			time.sleep(min(chunk_ms / 1000.0, (ms - elapsed) / 1000.0))
-			elapsed += chunk_ms
-			try:
-				process_ui_events()
-			except Exception:
-				# Window closed or error, fall back to normal sleep
-				time.sleep((ms - elapsed) / 1000.0)
-				break
-	else:
-		time.sleep(ms / 1000.0)
+Provides timing and utility functions.
+"""
+
+import time
 
 
 class StopWatch:
-	def __init__(self) -> None:
-		self._start = time.perf_counter()
+    """
+    A stopwatch to measure time intervals.
+    
+    Similar to the pybricks StopWatch, measures time in milliseconds.
+    """
+    
+    def __init__(self):
+        """Initialize the stopwatch and start counting"""
+        self._start_time = time.time()
+        self._pause_time = None
+        self._paused_duration = 0
+    
+    def time(self) -> int:
+        """
+        Get the current time of the stopwatch.
+        
+        Returns:
+            Time in milliseconds since the stopwatch was started or reset
+        """
+        if self._pause_time is not None:
+            # Currently paused
+            elapsed = (self._pause_time - self._start_time - self._paused_duration) * 1000
+        else:
+            elapsed = (time.time() - self._start_time - self._paused_duration) * 1000
+        return int(elapsed)
+    
+    def pause(self):
+        """Pause the stopwatch"""
+        if self._pause_time is None:
+            self._pause_time = time.time()
+    
+    def resume(self):
+        """Resume the stopwatch"""
+        if self._pause_time is not None:
+            self._paused_duration += time.time() - self._pause_time
+            self._pause_time = None
+    
+    def reset(self):
+        """Reset the stopwatch to zero"""
+        self._start_time = time.time()
+        self._pause_time = None
+        self._paused_duration = 0
 
-	def time(self) -> int:
-		"""Elapsed time in milliseconds."""
-		return int((time.perf_counter() - self._start) * 1000)
 
+def wait(time_ms: int):
+    """
+    Wait for a specified amount of time.
+    
+    Args:
+        time_ms: Time to wait in milliseconds
+    """
+    time.sleep(time_ms / 1000.0)
+
+
+class DataLog:
+    """
+    Simple data logger (stub for compatibility)
+    
+    In the real pybricks, this logs data to a file.
+    For the emulator, we'll just print to console.
+    """
+    
+    def __init__(self, *headers):
+        """Initialize with column headers"""
+        self.headers = headers
+        print(f"DataLog initialized with headers: {headers}")
+    
+    def log(self, *values):
+        """Log a row of data"""
+        # In emulator, just ignore or print if needed
+        pass
 

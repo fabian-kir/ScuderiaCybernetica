@@ -51,7 +51,7 @@ class PlatformController:
         self.hub = RobotHub()
         self.color_sensor = ColorSensor()
         self.drive_motor = DriveMotor()
-        self.plattform_motors = PlattformMotors()
+        self.plattform_motors = PlatformMotors()
         self.touch_sensors = TouchSensors()
         self.ultrasonic_sensor = UltrasonicSensor()
 

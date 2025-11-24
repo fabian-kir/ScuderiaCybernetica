@@ -1,4 +1,8 @@
-# Minimal emulator for pybricks used by this project
-__all__ = ["hubs", "ev3devices", "parameters", "robotics", "tools", "media"]
+"""
+Pybricks emulator module
 
+Mocks the pybricks library for testing without hardware.
+"""
+
+__version__ = "2.0.0"
 

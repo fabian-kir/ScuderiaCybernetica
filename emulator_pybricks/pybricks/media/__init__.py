@@ -1,3 +1,4 @@
-# Package marker for media submodule
-
+"""
+Pybricks media module
+"""
 

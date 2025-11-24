@@ -61,6 +61,18 @@ class DriveMotor:
 
     def get_power(self):
         return self._power
+    
+    def set_dc(self, duty_cycle):
+        """Set the motor duty cycle directly (0-100)"""
+        self.motor.dc(duty_cycle)
+    
+    def get_dc(self):
+        """Get the current duty cycle"""
+        # Calculate from power and battery voltage
+        battery_voltage = RobotHub().get_battery_voltage()
+        if battery_voltage > 0:
+            return self._power / battery_voltage
+        return 0
 
     def drive(self, speed):
         if speed == 0:

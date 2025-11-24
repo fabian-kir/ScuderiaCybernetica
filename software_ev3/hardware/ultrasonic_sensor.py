@@ -25,15 +25,13 @@ class UltrasonicSensor:
         for i in range(5):
             target_distance = self.get_distance()
 
-            if self.target_distance > 0:
+            if target_distance > 0:
                 break
 
         else:
             raise Exception("Could not calibrate ultrasonic sensor.")
 
-
-        if self.target_distance == 0:
-
+        self.target_distance = target_distance
         calibration_data.ultrasound_sensor_target_distance = self.target_distance
         RobotHub().print("Calibrated ultrasonic sensor to current state.")
 
@@ -52,7 +50,7 @@ class UltrasonicSensor:
             self.last_stable_distance = distance
             return distance
 
-    def load_calibration_data(self):
+    def load_calibration(self):
         from utils.calibration_data import calibration_data
 
         self.target_distance = calibration_data.ultrasound_sensor_target_distance

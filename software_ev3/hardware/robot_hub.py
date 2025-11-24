@@ -27,6 +27,10 @@ class RobotHub:
 
     def get_battery_power(self):
         return self.hub.battery.voltage() / 1000.0 # output in V instead of mV
+    
+    def get_battery_voltage(self):
+        """Alias for get_battery_power for compatibility"""
+        return self.get_battery_power()
 
     def display(self, text):
         """Display text on the EV3 screen."""

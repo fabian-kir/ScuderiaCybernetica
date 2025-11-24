@@ -15,6 +15,15 @@ class CONSTANTS:
     # Gear ratios for balance platform motors
     GEAR_RATIO_PLATFORM_FORWARD = -7
     GEAR_RATIO_PLATFORM_SIDEWAYS = 8.35
+    
+    # Aliases for different naming conventions
+    GEAR_RATIO_BALANCE_X = GEAR_RATIO_PLATFORM_FORWARD
+    GEAR_RATIO_BALANCE_Y = GEAR_RATIO_PLATFORM_SIDEWAYS
+    GEAR_RATIO_BALANCE_FORWARD = GEAR_RATIO_PLATFORM_FORWARD
+    GEAR_RATIO_BALANCE_SIDEWAYS = GEAR_RATIO_PLATFORM_SIDEWAYS
+    
+    # Drive motor gear ratio
+    GEAR_RATIO_DRIVE_MOTOR = 1.0
 
     # Motors need to go at a minimum speed so that there's no wiggle
     MIN_SPEED_PLATFORM_FORWARD = 25
@@ -26,9 +35,17 @@ class CONSTANTS:
     PLATFORM_FORWARD_SPEED_KP = 50
 
     PLATFORM_SIDEWAYS_SPEED_KP = 50
+    
+    # Alternative naming for platform control
+    PLATFORM_X_KP = 1.0
+    PLATFORM_X_MAX_SPEED = PLATFORM_FORWARD_MAX_SPEED
+    PLATFORM_Y_ULTRASONIC_KP = 1.0
+    PLATFORM_Y_ULTRASONIC_SPEED_KP = 50
 
     MOTOR_FORWARD_MAX_DEGREE = 20 # max rotation from calibration-0
     MOTOR_SIDEWAYS_MAX_DEGREE = 20
+    MOTOR_FORWARD_MAX_ANGLE = 20  # Alias for max degree
+    MOTOR_SIDEWAYS_MAX_ANGLE = 20
 
     # DRIVE MOTOR
     DRIVE_MOTOR_TARGET_SPEED = 300

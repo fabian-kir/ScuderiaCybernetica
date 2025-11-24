@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="64b9bce7-46dd-4567-81a1-dd9bc502dfff" name="Changes" comment="CLEANUP completed - testing required">
+      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/Emulate.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/runConfigurations/Emulate.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/emulator_pybricks/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emulator_pybricks/pybricks/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emulator_pybricks/pybricks/ev3devices.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emulator_pybricks/pybricks/hubs.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emulator_pybricks/pybricks/media/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emulator_pybricks/pybricks/media/ev3dev.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emulator_pybricks/pybricks/parameters.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emulator_pybricks/pybricks/robotics.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emulator_pybricks/pybricks/state.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emulator_pybricks/pybricks/tools.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emulator_pybricks/pybricks/ui.py" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="519ceb86dc086eadb949d83405dace9afb5c057e" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/fabian-kir/ScuderiaCybernetica.git",
+    "accountId": "949e9f3a-7e34-4217-8669-49134dd27685"
+  }
+}]]></component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.Emulate.executor": "Run",
+    "git-widget-placeholder": "main",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)"
+  }
+}]]></component>
+  <component name="TaskManager">
+    <servers />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/ScuderiaCybernetica$Emulate.coverage" NAME="Emulate Coverage Results" MODIFIED="1763912373705" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+  </component>
+</project>

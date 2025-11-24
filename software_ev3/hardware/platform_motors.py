@@ -90,4 +90,21 @@ class PlatformMotors:
     
     def sideways_get_angle(self):
         return self.motor_sideways.angle() / CONSTANTS.GEAR_RATIO_BALANCE_Y
+    
+    # Alternative method names for compatibility
+    def run_forever_x(self, speed):
+        """Alias for forward_set_speed"""
+        self.forward_set_speed(speed)
+    
+    def run_forever_y(self, speed):
+        """Alias for sideways_set_speed"""
+        self.sideways_set_speed(speed)
+    
+    def get_angle_x(self):
+        """Alias for forward_get_angle"""
+        return self.forward_get_angle()
+    
+    def get_angle_y(self):
+        """Alias for sideways_get_angle"""
+        return self.sideways_get_angle()
         

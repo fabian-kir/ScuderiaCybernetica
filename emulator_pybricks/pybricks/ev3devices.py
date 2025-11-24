@@ -1,343 +1,549 @@
-from .tools import wait
-from .state import EMU_STATE
-from .ui import process_ui_events
+"""
+Pybricks ev3devices module emulation
+
+Provides Motor and Sensor classes for the EV3.
+"""
+
 import time
+from typing import List, Optional
+from ..emulator_state import emulator_state, MotorMode
+from .parameters import Port, Stop, Direction, Color
 
 
 class Motor:
-	def __init__(self, port):
-		self._port = str(getattr(port, "value", port))
-		EMU_STATE.register_motor(self._port)
-		self._power = 0.0
-		self._speed = 0.0
-		self._last_speed_update_time = time.perf_counter()
-		process_ui_events()
-
-	def reset_angle(self, angle: float):
-		# Update angle integration before resetting
-		motors = EMU_STATE.get_motors()
-		for m in motors:
-			if m.port == self._port:
-				# Trigger angle update by calling set_motor with current values
-				EMU_STATE.set_motor(self._port, power=m.power, speed=m.speed,
-				                    target_speed=m.target_speed, using_run_mode=m.using_run_mode)
-				break
-		# Now reset the angle
-		EMU_STATE.set_motor(self._port, angle=angle)
-		process_ui_events()
-
-	def run(self, speed: float):
-		# Clamp and set target speed for angle integration
-		target_speed = max(-100.0, min(100.0, float(speed)))
-		self._speed = target_speed
-		# crude speed model follows power
-		self._speed += (self._power * 2.0 - self._speed) * 0.3
-		# Use run mode: we can track angle by integrating speed
-		# Clear any active background commands when starting a new run command
-		result = EMU_STATE.set_motor(self._port, power=self._power, speed=self._speed, 
-		                    target_speed=target_speed, using_run_mode=True,
-		                    clear_command=True)
-		self._handle_command_completion(result)
-		process_ui_events()
-
-	def dc(self, power: float):
-		# Clamp and set
-		self._power = max(-100.0, min(100.0, float(power)))
-		# Update speed based on elapsed time and current resistance
-		self._update_speed()
-		# Use dc mode: we cannot track angle accurately (no target speed)
-		# Clear any active background commands when using dc()
-		result = EMU_STATE.set_motor(self._port, power=self._power, speed=self._speed,
-		                    target_speed=0.0, using_run_mode=False, clear_command=True)
-		self._handle_command_completion(result)
-		process_ui_events()
-	
-	def _update_speed(self):
-		"""Update motor speed based on power, resistance, and elapsed time."""
-		# Safety check: ensure _speed is initialized
-		if self._speed is None:
-			self._speed = 0.0
-		
-		current_time = time.perf_counter()
-		
-		# Get resistance from motor state for power-to-speed conversion
-		motors = EMU_STATE.get_motors()
-		resistance = 2.0  # default fallback
-		for m in motors:
-			if m.port == self._port:
-				resistance = m.resistance
-				break
-		
-		# Calculate elapsed time since last update
-		if self._last_speed_update_time is None:
-			dt = 0.0
-		else:
-			dt = current_time - self._last_speed_update_time
-		
-		# Update speed using time-based dynamics
-		# Target speed is power * resistance (higher resistance = higher speed for same power)
-		# Use exponential approach: speed approaches target with time constant
-		target_speed = self._power * resistance
-		time_constant = 0.1  # seconds - how quickly speed responds to power changes
-		
-		if dt > 0 and dt < 1.0:  # Only update if reasonable time has passed
-			# Exponential approach: speed = speed + (target - speed) * (1 - exp(-dt/tau))
-			# For small dt/tau, this approximates: speed += (target - speed) * dt / tau
-			alpha = min(1.0, dt / time_constant)
-			self._speed += (target_speed - self._speed) * alpha
-		
-		self._last_speed_update_time = current_time
-
-	def speed(self) -> float:
-		# return current emulated speed
-		# Update speed based on elapsed time (important for PID controllers)
-		self._update_speed()
-		# Check for command completion while processing events
-		process_ui_events()
-		# Sync updated speed with MotorState and check for command completion
-		motors = EMU_STATE.get_motors()
-		for m in motors:
-			if m.port == self._port:
-				result = EMU_STATE.set_motor(self._port, power=self._power, speed=self._speed,
-				                    target_speed=m.target_speed, using_run_mode=m.using_run_mode)
-				self._handle_command_completion(result)
-				break
-		# Safety check: ensure we never return None
-		if self._speed is None:
-			self._speed = 0.0
-		return self._speed
-
-	def angle(self) -> float:
-		# Return current angle (only accurate when using run(), not dc())
-		process_ui_events()
-		# Update angle integration before reading and check for command completion
-		motors = EMU_STATE.get_motors()
-		for m in motors:
-			if m.port == self._port:
-				# Trigger angle update by calling set_motor with current values
-				result = EMU_STATE.set_motor(self._port, power=m.power, speed=m.speed,
-				                    target_speed=m.target_speed, using_run_mode=m.using_run_mode)
-				self._handle_command_completion(result)
-				return m.angle
-		return 0.0
-	
-	def _handle_command_completion(self, completion_info):
-		"""Handle completed background motor commands by applying the 'then' behavior."""
-		if completion_info is None:
-			return
-		
-		completed, then_behavior = completion_info
-		if completed and then_behavior is not None:
-			from .parameters import Stop
-			if then_behavior == Stop.HOLD or (hasattr(then_behavior, 'value') and then_behavior.value == "HOLD"):
-				self.hold()
-			elif then_behavior == Stop.COAST or (hasattr(then_behavior, 'value') and then_behavior.value == "COAST"):
-				self.stop()
-			elif then_behavior == Stop.BRAKE or (hasattr(then_behavior, 'value') and then_behavior.value == "BRAKE"):
-				self.brake()
-
-	def run_angle(self, speed: int, rotation_angle: float, then=None, wait=True):
-		"""Run motor at specified speed by a given angle.
-		
-		According to Pybricks API: Runs the motor at a constant speed by a given angle.
-		The motor accelerates to the given speed, keeps running at this speed, and then decelerates.
-		"""
-		from .tools import wait as wait_func
-		from .parameters import Stop
-		import time
-
-		if not isinstance(speed, int):
-			raise TypeError("speed must be an int")
-		# Validate inputs
-		if speed is None:
-			raise ValueError("speed cannot be None")
-		if rotation_angle is None:
-			raise ValueError("rotation_angle cannot be None")
-		
-		speed = float(speed)
-		rotation_angle = float(rotation_angle)
-		
-		# Get current angle (this also updates integration)
-		current_angle = self.angle()
-		target_angle = current_angle + rotation_angle
-		
-		# Determine direction - speed sign should match rotation direction
-		if rotation_angle < 0:
-			actual_speed = -abs(speed)
-		else:
-			actual_speed = abs(speed)
-		
-		# Default "then" behavior is HOLD if not specified
-		if then is None:
-			then = Stop.HOLD
-		
-		if wait:
-			# Start running at specified speed
-			self.run(actual_speed)
-			
-			# Wait until target angle is reached
-			# Use a small tolerance to account for integration precision
-			tolerance = 1.0  # degrees
-			while True:
-				current = self.angle()
-				if rotation_angle >= 0:
-					if current >= target_angle - tolerance:
-						break
-				else:
-					if current <= target_angle + tolerance:
-						break
-				wait_func(10)  # Small delay to avoid busy-waiting
-			
-			# Apply "then" behavior
-			if then == Stop.HOLD or (hasattr(then, 'value') and then.value == "HOLD"):
-				self.hold()
-			elif then == Stop.COAST or (hasattr(then, 'value') and then.value == "COAST"):
-				self.stop()
-			elif then == Stop.BRAKE or (hasattr(then, 'value') and then.value == "BRAKE"):
-				self.brake()
-		else:
-			# Background mode: start running and track target
-			# Start running at specified speed
-			self.run(actual_speed)
-			
-			# Set up background tracking
-			EMU_STATE.set_motor(self._port, 
-			                    target_angle=target_angle,
-			                    command_then=then,
-			                    command_start_angle=current_angle)
-			process_ui_events()
-
-	def run_target(self, speed: float, target_angle: float, then=None, wait=True):
-		"""Run motor at specified speed towards a given target angle.
-
-		According to Pybricks API: Runs the motor at a constant speed towards a given target angle.
-		The direction of rotation is automatically selected based on the target angle.
-		"""
-		current_angle = self.angle()
-		angle_diff = target_angle - current_angle
-		self.run_angle(speed, angle_diff, then=then, wait=wait)
-
-	def run_time(self, speed: float, time_ms: float, then=None, wait=True):
-		"""Run motor at specified speed for a given amount of time.
-		
-		According to Pybricks API: Runs the motor at a constant speed for a given amount of time.
-		The motor accelerates to the given speed, keeps running at this speed, and then decelerates.
-		"""
-		from .tools import wait as wait_func
-		from .parameters import Stop
-		import time as time_module
-
-		if not isinstance(speed, int):
-			raise TypeError("speed must be an int")
-		
-		# Default "then" behavior is HOLD if not specified
-		if then is None:
-			then = Stop.HOLD
-		
-		# Start running at specified speed
-		self.run(speed)
-		
-		start_time = time_module.perf_counter()
-		end_time = start_time + (time_ms / 1000.0)  # Convert ms to seconds
-		
-		if wait:
-			# Wait until time has elapsed
-			while time_module.perf_counter() < end_time:
-				wait_func(10)  # Small delay to avoid busy-waiting
-			
-			# Apply "then" behavior
-			if then == Stop.HOLD or (hasattr(then, 'value') and then.value == "HOLD"):
-				self.hold()
-			elif then == Stop.COAST or (hasattr(then, 'value') and then.value == "COAST"):
-				self.stop()
-			elif then == Stop.BRAKE or (hasattr(then, 'value') and then.value == "BRAKE"):
-				self.brake()
-		else:
-			# Background mode: track time target
-			EMU_STATE.set_motor(self._port,
-			                    target_time_end=end_time,
-			                    command_then=then,
-			                    command_start_time=start_time)
-			process_ui_events()
-
-	def stop(self):
-		"""Stops the motor and lets it spin freely (coast).
-		
-		The motor gradually stops due to friction.
-		"""
-		self._power = 0.0
-		self._speed = 0.0
-		# stop() coasts, so angle tracking becomes inaccurate - disable it
-		result = EMU_STATE.set_motor(self._port, power=self._power, speed=self._speed,
-		                    target_speed=0.0, using_run_mode=False, clear_command=True)
-		self._handle_command_completion(result)
-		process_ui_events()
-	
-	def brake(self):
-		"""Passively brakes the motor.
-		
-		The motor stops due to friction, plus the voltage that is generated
-		while the motor is still moving.
-		"""
-		self._power = 0.0
-		self._speed = 0.0
-		# brake() stops the motor, angle tracking becomes inaccurate - disable it
-		result = EMU_STATE.set_motor(self._port, power=self._power, speed=self._speed,
-		                    target_speed=0.0, using_run_mode=False, clear_command=True)
-		self._handle_command_completion(result)
-		process_ui_events()
-
-	def hold(self):
-		"""Stops the motor and actively holds it at its current angle."""
-		self._power = 0.0
-		self._speed = 0.0
-		# hold() actively holds position, so angle tracking should remain enabled
-		# Keep using_run_mode=True so angle stays visible and accurate
-		result = EMU_STATE.set_motor(self._port, power=self._power, speed=self._speed,
-		                    target_speed=0.0, using_run_mode=True, clear_command=True)
-		self._handle_command_completion(result)
-		process_ui_events()
-
-
-class UltrasonicSensor:
-	def __init__(self, port):
-		self._port = str(getattr(port, "value", port))
-		EMU_STATE.register_sensor(self._port, initial=100.0)
-		process_ui_events()
-
-	def distance(self) -> float:
-		# Return centimeters to match typical usage; project treats as generic number
-		process_ui_events()
-		for s in EMU_STATE.get_sensors():
-			if s.port == self._port:
-				return s.value
-		return 0.0
+    """
+    EV3 Motor
+    
+    Controls a single motor connected to the EV3.
+    Supports various control modes: dc, run, run_time, run_angle, run_target, track_target.
+    """
+    
+    def __init__(self, port, positive_direction=Direction.CLOCKWISE, gears: Optional[List[float]] = None):
+        """
+        Initialize a motor
+        
+        Args:
+            port: Port to which the motor is connected
+            positive_direction: Direction considered positive
+            gears: Optional gear train ratios
+        """
+        self.port = str(port)
+        self.positive_direction = positive_direction
+        self.gears = gears or [1.0]
+        
+        # Register with emulator state
+        emulator_state.register_motor(self.port, self.gears)
+        
+        emulator_state.log_event(f"Motor initialized on port {self.port}")
+    
+    def _get_gear_ratio(self) -> float:
+        """Get the total gear ratio"""
+        ratio = 1.0
+        for gear in self.gears:
+            ratio *= gear
+        return ratio
+    
+    def angle(self) -> float:
+        """
+        Get the rotation angle of the motor
+        
+        Returns:
+            Angle in degrees
+        """
+        motor = emulator_state.get_motor(self.port)
+        if motor:
+            return motor['angle'] / self._get_gear_ratio()
+        return 0.0
+    
+    def speed(self) -> float:
+        """
+        Get the speed of the motor
+        
+        This operation takes 50ms as specified.
+        
+        Returns:
+            Speed in degrees per second
+        """
+        # Simulate 50ms delay
+        time.sleep(emulator_state.motor_speed_delay)
+        
+        motor = emulator_state.get_motor(self.port)
+        if motor:
+            return motor['speed'] / self._get_gear_ratio()
+        return 0.0
+    
+    def reset_angle(self, angle: float = 0):
+        """
+        Reset the motor angle to a specific value
+        
+        Args:
+            angle: New angle value in degrees
+        """
+        gear_ratio = self._get_gear_ratio()
+        emulator_state.update_motor(self.port, angle=angle * gear_ratio)
+    
+    def stop(self):
+        """
+        Stop the motor and let it coast
+        """
+        emulator_state.set_motor_mode(self.port, MotorMode.STOP, 0)
+    
+    def brake(self):
+        """
+        Passively resist movement (brake)
+        """
+        emulator_state.set_motor_mode(self.port, MotorMode.STOP, 0)
+    
+    def hold(self):
+        """
+        Stop the motor and actively hold position
+        """
+        emulator_state.set_motor_mode(self.port, MotorMode.HOLD, 0)
+    
+    def run(self, speed: float):
+        """
+        Run the motor at a constant speed
+        
+        Args:
+            speed: Target speed in degrees per second
+        """
+        gear_ratio = self._get_gear_ratio()
+        adjusted_speed = speed * gear_ratio
+        emulator_state.set_motor_mode(self.port, MotorMode.RUN, adjusted_speed)
+        emulator_state.update_motor(self.port, target_speed=adjusted_speed)
+    
+    def run_time(self, speed: float, time_ms: int, then: Stop = Stop.HOLD, wait: bool = True):
+        """
+        Run the motor at a constant speed for a specific time
+        
+        Args:
+            speed: Target speed in degrees per second
+            time_ms: Duration in milliseconds
+            then: What to do after time expires
+            wait: Whether to wait for completion
+        """
+        gear_ratio = self._get_gear_ratio()
+        adjusted_speed = speed * gear_ratio
+        
+        emulator_state.set_motor_mode(self.port, MotorMode.RUN_TIME, adjusted_speed)
+        emulator_state.update_motor(self.port, target_speed=adjusted_speed)
+        
+        if wait:
+            time.sleep(time_ms / 1000.0)
+            if then == Stop.HOLD:
+                self.hold()
+            elif then == Stop.BRAKE:
+                self.brake()
+            else:
+                self.stop()
+    
+    def run_angle(self, speed: float, rotation_angle: float, then: Stop = Stop.HOLD, wait: bool = True):
+        """
+        Run the motor at a constant speed for a specific angle
+        
+        Args:
+            speed: Target speed in degrees per second
+            rotation_angle: Angle to rotate in degrees
+            then: What to do after rotation completes
+            wait: Whether to wait for completion
+        """
+        gear_ratio = self._get_gear_ratio()
+        adjusted_speed = speed * gear_ratio
+        adjusted_angle = rotation_angle * gear_ratio
+        
+        current_angle = emulator_state.get_motor(self.port)['angle']
+        target_angle = current_angle + adjusted_angle
+        
+        emulator_state.set_motor_mode(self.port, MotorMode.RUN_ANGLE, adjusted_speed)
+        emulator_state.update_motor(self.port, target_speed=adjusted_speed, target_angle=target_angle)
+        
+        if wait:
+            # Estimate time needed
+            time_needed = abs(rotation_angle / speed)
+            time.sleep(time_needed)
+            
+            # Update angle
+            emulator_state.update_motor(self.port, angle=target_angle)
+            
+            if then == Stop.HOLD:
+                self.hold()
+            elif then == Stop.BRAKE:
+                self.brake()
+            else:
+                self.stop()
+    
+    def run_target(self, speed: float, target_angle: float, then: Stop = Stop.HOLD, wait: bool = True):
+        """
+        Run the motor to an absolute target angle
+        
+        Args:
+            speed: Maximum speed in degrees per second
+            target_angle: Target angle in degrees
+            then: What to do after reaching target
+            wait: Whether to wait for completion
+        """
+        gear_ratio = self._get_gear_ratio()
+        adjusted_speed = speed * gear_ratio
+        adjusted_target = target_angle * gear_ratio
+        
+        current_angle = emulator_state.get_motor(self.port)['angle']
+        angle_diff = abs(adjusted_target - current_angle)
+        
+        emulator_state.set_motor_mode(self.port, MotorMode.RUN_TARGET, adjusted_speed)
+        emulator_state.update_motor(self.port, target_speed=adjusted_speed, target_angle=adjusted_target)
+        
+        if wait:
+            # Estimate time needed
+            time_needed = angle_diff / adjusted_speed
+            time.sleep(time_needed)
+            
+            # Update angle
+            emulator_state.update_motor(self.port, angle=adjusted_target)
+            
+            if then == Stop.HOLD:
+                self.hold()
+            elif then == Stop.BRAKE:
+                self.brake()
+            else:
+                self.stop()
+    
+    def track_target(self, target_angle: float):
+        """
+        Track a target angle (for smooth following of changing targets)
+        
+        Args:
+            target_angle: Target angle in degrees
+        """
+        gear_ratio = self._get_gear_ratio()
+        adjusted_target = target_angle * gear_ratio
+        
+        emulator_state.set_motor_mode(self.port, MotorMode.TRACK_TARGET, adjusted_target)
+        emulator_state.update_motor(self.port, target_angle=adjusted_target)
+    
+    def dc(self, duty: float):
+        """
+        Set motor duty cycle (direct power control)
+        
+        This is the low-level control mode where you set the duty cycle directly.
+        The motor speed is not regulated and depends on the load.
+        
+        Args:
+            duty: Duty cycle from -100 to 100 (percentage)
+        """
+        emulator_state.set_motor_mode(self.port, MotorMode.DC, duty)
+        emulator_state.update_motor(self.port, dc_value=duty)
+    
+    def run_until_stalled(self, speed: float, then: Stop = Stop.HOLD, duty_limit: Optional[float] = None):
+        """
+        Run the motor until it stalls
+        
+        Args:
+            speed: Target speed
+            then: What to do after stall
+            duty_limit: Duty cycle limit
+        
+        Returns:
+            Angle at which the motor stalled
+        """
+        # Simplified for emulator - just run for a short time
+        self.run(speed)
+        time.sleep(0.5)
+        
+        if then == Stop.HOLD:
+            self.hold()
+        elif then == Stop.BRAKE:
+            self.brake()
+        else:
+            self.stop()
+        
+        return self.angle()
+    
+    def stalled(self) -> bool:
+        """Check if the motor is currently stalled"""
+        motor = emulator_state.get_motor(self.port)
+        if motor:
+            return motor.get('stall_detected', False)
+        return False
+    
+    def load(self) -> float:
+        """
+        Get the load on the motor
+        
+        Returns:
+            Estimated load as a percentage
+        """
+        # Simplified for emulator
+        return 50.0
 
 
 class ColorSensor:
-	def __init__(self, port):
-		self._port = str(getattr(port, "value", port))
-		EMU_STATE.register_sensor(self._port, initial=50.0)
-		process_ui_events()
+    """
+    EV3 Color Sensor
+    
+    Detects colors and measures reflected light intensity.
+    """
+    
+    def __init__(self, port):
+        """
+        Initialize the color sensor
+        
+        Args:
+            port: Port to which the sensor is connected
+        """
+        self.port = str(port)
+        emulator_state.register_sensor(self.port, "ColorSensor")
+        emulator_state.log_event(f"ColorSensor initialized on port {self.port}")
+    
+    def color(self) -> Optional[Color]:
+        """
+        Get the detected color
+        
+        Returns:
+            Color enum value or None
+        """
+        # Simulate 50ms delay
+        time.sleep(emulator_state.sensor_read_delay)
+        
+        # Map reflection to color (simplified)
+        reflection = emulator_state.get_sensor_value(self.port)
+        
+        if reflection < 10:
+            return Color.BLACK
+        elif reflection < 25:
+            return Color.BLUE
+        elif reflection < 40:
+            return Color.GREEN
+        elif reflection < 55:
+            return Color.YELLOW
+        elif reflection < 70:
+            return Color.RED
+        elif reflection < 85:
+            return Color.WHITE
+        else:
+            return Color.WHITE
+    
+    def reflection(self) -> int:
+        """
+        Get the reflection intensity
+        
+        Returns:
+            Reflection percentage (0-100)
+        """
+        # Simulate 50ms delay
+        time.sleep(emulator_state.sensor_read_delay)
+        
+        value = emulator_state.get_sensor_value(self.port)
+        return int(value) if value is not None else 0
+    
+    def ambient(self) -> int:
+        """
+        Get ambient light intensity
+        
+        Returns:
+            Ambient light percentage (0-100)
+        """
+        # Simulate 50ms delay
+        time.sleep(emulator_state.sensor_read_delay)
+        
+        # Similar to reflection for simplicity
+        value = emulator_state.get_sensor_value(self.port)
+        return int(value * 0.8) if value is not None else 0
+    
+    def rgb(self) -> tuple:
+        """
+        Get RGB color values
+        
+        Returns:
+            Tuple of (red, green, blue) percentages
+        """
+        # Simulate 50ms delay
+        time.sleep(emulator_state.sensor_read_delay)
+        
+        # Simplified: return based on reflection
+        reflection = emulator_state.get_sensor_value(self.port)
+        return (reflection, reflection, reflection)
 
-	def reflection(self) -> int:
-		process_ui_events()
-		for s in EMU_STATE.get_sensors():
-			if s.port == self._port:
-				return int(s.value)
-		return 0
+
+class UltrasonicSensor:
+    """
+    EV3 Ultrasonic Sensor
+    
+    Measures distance to objects using ultrasonic sound waves.
+    """
+    
+    def __init__(self, port):
+        """
+        Initialize the ultrasonic sensor
+        
+        Args:
+            port: Port to which the sensor is connected
+        """
+        self.port = str(port)
+        emulator_state.register_sensor(self.port, "UltrasonicSensor")
+        emulator_state.log_event(f"UltrasonicSensor initialized on port {self.port}")
+    
+    def distance(self) -> int:
+        """
+        Get the distance to the nearest object
+        
+        Returns:
+            Distance in millimeters
+        """
+        # Simulate 50ms delay
+        time.sleep(emulator_state.sensor_read_delay)
+        
+        value = emulator_state.get_sensor_value(self.port)
+        return int(value) if value is not None else 2550
+    
+    def presence(self) -> bool:
+        """
+        Check if any object is detected
+        
+        Returns:
+            True if an object is detected, False otherwise
+        """
+        # Simulate 50ms delay
+        time.sleep(emulator_state.sensor_read_delay)
+        
+        distance = emulator_state.get_sensor_value(self.port)
+        return distance is not None and distance < 2550
+
+
+class TouchSensor:
+    """
+    EV3 Touch Sensor
+    
+    Detects when the sensor button is pressed.
+    """
+    
+    def __init__(self, port):
+        """
+        Initialize the touch sensor
+        
+        Args:
+            port: Port to which the sensor is connected
+        """
+        self.port = str(port)
+        emulator_state.register_sensor(self.port, "TouchSensor")
+        emulator_state.log_event(f"TouchSensor initialized on port {self.port}")
+    
+    def pressed(self) -> bool:
+        """
+        Check if the sensor is pressed
+        
+        Returns:
+            True if pressed, False otherwise
+        """
+        # Simulate 50ms delay
+        time.sleep(emulator_state.sensor_read_delay)
+        
+        value = emulator_state.get_sensor_value(self.port)
+        return bool(value) if value is not None else False
+
+
+class GyroSensor:
+    """
+    EV3 Gyro Sensor
+    
+    Measures rotation rate and angle.
+    """
+    
+    def __init__(self, port, direction=Direction.CLOCKWISE):
+        """
+        Initialize the gyro sensor
+        
+        Args:
+            port: Port to which the sensor is connected
+            direction: Positive direction
+        """
+        self.port = str(port)
+        self.direction = direction
+        emulator_state.register_sensor(self.port, "GyroSensor")
+        emulator_state.log_event(f"GyroSensor initialized on port {self.port}")
+    
+    def speed(self) -> int:
+        """
+        Get the rotation rate
+        
+        Returns:
+            Rotation rate in degrees per second
+        """
+        # Simulate 50ms delay
+        time.sleep(emulator_state.sensor_read_delay)
+        
+        value = emulator_state.get_sensor_value(self.port)
+        return int(value) if value is not None else 0
+    
+    def angle(self) -> int:
+        """
+        Get the accumulated angle
+        
+        Returns:
+            Angle in degrees
+        """
+        # Simulate 50ms delay
+        time.sleep(emulator_state.sensor_read_delay)
+        
+        value = emulator_state.get_sensor_value(self.port)
+        return int(value) if value is not None else 0
+    
+    def reset_angle(self, angle: int = 0):
+        """Reset the angle to a specific value"""
+        emulator_state.set_sensor_value(self.port, angle)
+
 
 class InfraredSensor:
-	def __init__(self, port):
-		self._port = str(getattr(port, "value", port))
-		EMU_STATE.register_sensor(self._port, initial=50.0)
-		process_ui_events()
+    """
+    EV3 Infrared Sensor
+    
+    Measures distance and detects infrared beacons.
+    """
+    
+    def __init__(self, port):
+        """
+        Initialize the infrared sensor
+        
+        Args:
+            port: Port to which the sensor is connected
+        """
+        self.port = str(port)
+        emulator_state.register_sensor(self.port, "InfraredSensor")
+        emulator_state.log_event(f"InfraredSensor initialized on port {self.port}")
+    
+    def distance(self) -> int:
+        """
+        Get approximate distance to an object
+        
+        Returns:
+            Distance percentage (0-100)
+        """
+        # Simulate 50ms delay
+        time.sleep(emulator_state.sensor_read_delay)
+        
+        value = emulator_state.get_sensor_value(self.port)
+        return int(value) if value is not None else 100
+    
+    def beacon(self, channel: int) -> tuple:
+        """
+        Get beacon location
+        
+        Returns:
+            Tuple of (distance, angle) or (None, None) if not detected
+        """
+        # Simulate 50ms delay
+        time.sleep(emulator_state.sensor_read_delay)
+        
+        return (None, None)
+    
+    def buttons(self, channel: int) -> list:
+        """
+        Get pressed buttons on the infrared remote
+        
+        Returns:
+            List of pressed buttons
+        """
+        # Simulate 50ms delay
+        time.sleep(emulator_state.sensor_read_delay)
+        
+        return []
 
-	def distance(self) -> int:
-		def distance(self) -> float:
-			# Return centimeters to match typical usage; project treats as generic number
-			process_ui_events()
-			for s in EMU_STATE.get_sensors():
-				if s.port == self._port:
-					return s.value
-			return 0.0

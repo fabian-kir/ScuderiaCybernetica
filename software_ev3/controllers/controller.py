@@ -3,7 +3,7 @@ import os
 from utils.singleton import singleton
 from utils.data_logger import log_data
 
-from hardware.plattform_motors import PlattformMotors
+from hardware.platform_motors import PlatformMotors
 from hardware.robot_hub import RobotHub
 from hardware.drive_motor import DriveMotor
 from hardware.ultrasonic_sensor import UltrasonicSensor
@@ -22,7 +22,7 @@ class Controller:
     def __init__(self):
         # HARDWARE WRAPPERS
         self.hub = RobotHub()
-        self.plattform_motors = PlattformMotors()
+        self.plattform_motors = PlatformMotors()
         self.drive_motor = DriveMotor()
         self.ultrasonic_sensor = UltrasonicSensor()
         self.color_sensor = ColorSensor()
