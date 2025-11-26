@@ -5,22 +5,23 @@ runtime so the project can be executed without the physical brick.
 
 ## Running the emulator
 
-1. Install the project dependencies as usual (no additional packages are
-   required; the emulator only depends on Tk, which ships with Python on macOS).
+1. Install the project dependencies as usual – the emulator now serves a
+   lightweight web UI so no native GUI frameworks are required.
 2. Launch the emulator entry-point:
 
    ```bash
    python3 emulator_main.py
    ```
 
-   This starts the Tk UI and spawns the regular `Controller` inside a worker
-   thread. All other modules stay untouched, so the same code keeps running on
-   the EV3 via `onboard_main.py`.
+   The script starts a small HTTP server (default `http://127.0.0.1:8765`),
+   opens your default browser, and spawns the regular `Controller` inside a
+   worker thread. All other modules stay untouched, so the same code keeps
+   running on the EV3 via `onboard_main.py`. If the browser does not open
+   automatically, copy the printed URL into your browser of choice.
 
 ## UI overview
 
-The window is intentionally simple and focuses on the debugging features that
-were requested:
+The browser UI mirrors the requested debugging features:
 
 - **Motors panel** – lists every instantiated motor together with its port,
   current mode (`run`, `dc`, `hold`, …), command value and measured angle. When

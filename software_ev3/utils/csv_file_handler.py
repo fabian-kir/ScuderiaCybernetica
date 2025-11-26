@@ -1,3 +1,7 @@
+import csv
+import os
+
+
 class CSVFileHandler:
     def __init__(self, filename, mode='r'):
         # Ensure mode is valid ('r', 'w', 'a')
@@ -9,7 +13,11 @@ class CSVFileHandler:
 
     def __enter__(self):
         # Open the file using built-in open()
-        self.file = open(self.filename, self.mode)
+        if self.mode in ('w', 'a'):
+            directory = os.path.dirname(self.filename)
+            if directory:
+                os.makedirs(directory, exist_ok=True)
+        self.file = open(self.filename, self.mode, newline='')
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -54,3 +62,50 @@ class CSVFileHandler:
         if len(data) == 1:
             return data[0]
         return data
+
+    def write_dict(self, rows, headers=None):
+        """
+        Write iterable rows to CSV, optionally with headers.
+        Supports rows as dicts or sequences.
+        """
+        if rows is None:
+            return
+
+        writer = csv.writer(self.file)
+
+        rows = list(rows)
+        if not rows:
+            return
+
+        sample = rows[0]
+        # Determine headers and normalization strategy
+        if isinstance(sample, dict):
+            fieldnames = headers or list(sample.keys())
+            writer.writerow(fieldnames)
+            for row in rows:
+                writer.writerow([row.get(field, "") for field in fieldnames])
+        else:
+            if headers:
+                writer.writerow(headers)
+            for row in rows:
+                writer.writerow(row)
+
+    def read_dict(self):
+        """
+        Read CSV content as list of dictionaries when headers are present.
+        Falls back to list of rows if the file has no header.
+        """
+        self.file.seek(0)
+        reader = csv.reader(self.file)
+        rows = list(reader)
+
+        if not rows:
+            return []
+
+        header = rows[0]
+        has_alpha = any(any(ch.isalpha() for ch in cell) for cell in header)
+        if header and has_alpha:
+            # Treat first row as header
+            return [dict(zip(header, row)) for row in rows[1:]]
+
+        return rows

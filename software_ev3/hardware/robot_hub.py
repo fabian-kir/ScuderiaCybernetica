@@ -25,7 +25,7 @@ class RobotHub:
             self.hub.speaker.beep()
             self.hub.screen.print("Initializing hardware...")
 
-    def get_battery_power(self):
+    def get_battery_voltage(self):
         return self.hub.battery.voltage() / 1000.0 # output in V instead of mV
 
     def display(self, text):

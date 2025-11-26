@@ -60,7 +60,7 @@ class Controller:
 
 
     def load_calibrations(self):
-        from utils.calibration_data import calibration_data
+        from software_ev3.utils.calibration_data import calibration_data
 
         if CONSTANTS.CALIBRATE_ON_START:
             hub = RobotHub()

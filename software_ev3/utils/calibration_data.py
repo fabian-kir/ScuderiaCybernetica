@@ -1,6 +1,6 @@
-from config.constants import CONSTANTS
-from utils.singleton import singleton
-from csv_file_handler import CSVFileHandler
+from software_ev3.config.constants import CONSTANTS
+from software_ev3.utils.singleton import singleton
+from software_ev3.utils.csv_file_handler import CSVFileHandler
 
 
 @singleton

@@ -29,7 +29,7 @@ class ColorSensor:
         return self.sensor.reflection()
 
     def save_calibration(self):
-        from utils.calibration_data import calibration_data
+        from software_ev3.utils.calibration_data import calibration_data
 
         reflection = self.get_reflection()
 
@@ -37,7 +37,7 @@ class ColorSensor:
         RobotHub().print("Calibrated color sensor to current state.")
 
     def load_calibration(self):
-        from utils.calibration_data import calibration_data
+        from software_ev3.utils.calibration_data import calibration_data
 
         self.target_reflection = calibration_data.get("color_sensor_target_reflection")
         RobotHub().print("loaded color sensor target reflection to:", self.target_reflection)

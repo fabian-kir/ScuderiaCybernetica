@@ -58,20 +58,29 @@ class PlatformMotors:
         if abs(speed) < CONSTANTS.MIN_SPEED_PLATFORM_FORWARD:
             raise MotorControlException("Motor speed is lower than minimum speed. This leads to motor wiggle. Set speed: " + speed)
 
-        if speed > 0 and self.forward_get_angle() > CONSTANTS.MOTOR_FORWARD_MAX_ANGLE:
+        if speed > 0 and self.forward_get_angle() > CONSTANTS.MOTOR_FORWARD_MAX_DEGREE:
             speed = 0
-        elif speed < 0 and self.forward_get_angle() < -CONSTANTS.MOTOR_FORWARD_MAX_ANGLE:
+        elif speed < 0 and self.forward_get_angle() < -CONSTANTS.MOTOR_FORWARD_MAX_DEGREE:
             speed = 0
 
         self.motor_forward.run(speed)
 
-    def sideways_set_speed(self, speed):
-        if abs(speed) < CONSTANTS.MIN_SPEED_PLATFORM_SIDEWAYS:
-            raise MotorControlException("Motor speed is lower than minimum speed. This leads to motor wiggle. Set speed: " + speed)
+    def sideways_set_speed(self, speed, ramp_up_speed_to_min=False):
+        if speed == 0.0:
+            self.motor_sideways.hold()
+            return
 
-        if speed > 0 and self.sideways_get_angle() > CONSTANTS.MOTOR_FORWARD_MAX_ANGLE:
+        if abs(speed) < CONSTANTS.MIN_SPEED_PLATFORM_SIDEWAYS:
+            if ramp_up_speed_to_min and speed > 0:
+                speed = CONSTANTS.MIN_SPEED_PLATFORM_SIDEWAYS
+            elif ramp_up_speed_to_min and speed < 0:
+                speed = -CONSTANTS.MIN_SPEED_PLATFORM_SIDEWAYS
+            else:
+                raise MotorControlException("Motor speed is lower than minimum speed. This leads to motor wiggle. Set speed: " + str(speed))
+
+        if speed > 0 and self.sideways_get_angle() > CONSTANTS.MOTOR_FORWARD_MAX_DEGREE:
             speed = 0
-        elif speed < 0 and self.sideways_get_angle() < -CONSTANTS.MOTOR_FORWARD_MAX_ANGLE:
+        elif speed < 0 and self.sideways_get_angle() < -CONSTANTS.MOTOR_FORWARD_MAX_DEGREE:
             speed = 0
 
         self.motor_sideways.run(speed)
@@ -86,8 +95,8 @@ class PlatformMotors:
         self.motor_sideways.hold()
     
     def forward_get_angle(self):
-        return self.motor_forward.angle() / CONSTANTS.GEAR_RATIO_BALANCE_X
+        return self.motor_forward.angle() / CONSTANTS.GEAR_RATIO_PLATFORM_FORWARD
     
     def sideways_get_angle(self):
-        return self.motor_sideways.angle() / CONSTANTS.GEAR_RATIO_BALANCE_Y
+        return self.motor_sideways.angle() / CONSTANTS.GEAR_RATIO_PLATFORM_SIDEWAYS
         

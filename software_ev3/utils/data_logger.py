@@ -10,7 +10,6 @@ from time import time
 from pybricks.tools import StopWatch
 from software_ev3.utils.singleton import singleton
 
-from software_ev3.hardware.robot_hub import RobotHub
 from software_ev3.utils.csv_file_handler import CSVFileHandler
 
 
@@ -88,7 +87,7 @@ class DataLogger:
 
             self._file_initialized = True
         except Exception:
-            RobotHub().print("Error opening log file:", self.log_file)
+            print("Error opening log file:", self.log_file)
             # Silently fail to avoid disrupting robot operation
             self._file_handle = None
             self._file_initialized = False
@@ -110,7 +109,7 @@ class DataLogger:
         if not self._file_initialized or self._file_handle is None:
             self._ensure_file_initialized()
             if not self._file_initialized:
-                RobotHub().print("Error re-initializing log file")
+                print("Error re-initializing log file")
                 return
 
         try:
@@ -121,7 +120,7 @@ class DataLogger:
         except Exception:
             # Silently fail to avoid disrupting robot operation
             # Close file handle so it can be re-opened next time
-            RobotHub().print("Error logging data to file")
+            print("Error logging data to file")
             if self._file_handle:
                 try:
                     self._file_handle.__exit__(None, None, None)

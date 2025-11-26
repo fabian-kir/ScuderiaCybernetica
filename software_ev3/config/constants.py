@@ -26,6 +26,9 @@ class CONSTANTS:
     PLATFORM_FORWARD_SPEED_KP = 50
 
     PLATFORM_SIDEWAYS_SPEED_KP = 50
+    PLATFORM_SIDEWAYS_MAX_SPEED = 1000
+
+    PLATFORM_SIDEWAYS_SPEED_KP = 50
 
     MOTOR_FORWARD_MAX_DEGREE = 20 # max rotation from calibration-0
     MOTOR_SIDEWAYS_MAX_DEGREE = 20
@@ -36,7 +39,7 @@ class CONSTANTS:
     DRIVE_MOTOR_TARGET_SPEED = 300
     DRIVE_MOTOR_MAX_SPEED = 700 # in deg / s
 
-    DRIVE_MOTOR_MIN_POWER = 2 # in V
+    DRIVE_MOTOR_MIN_POWER = .5 # in V
 
     # Proportional gain: power output per speed error
     # Higher values = faster response but may cause overshoot/oscillation
