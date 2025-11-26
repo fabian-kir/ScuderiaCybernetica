@@ -23,8 +23,8 @@ class PlatformMotors:
     
     def __init__(self):
         """Initialize platform motors with configuration from constants."""
-        self.port_forward = PORTS["LARGE_BALANCE_MOTOR"]
-        self.port_sideways = PORTS["SMALL_BALANCE_MOTOR"]
+        self.port_forward = PORTS["SMALL_BALANCE_MOTOR"]
+        self.port_sideways = PORTS["LARGE_BALANCE_MOTOR"]
 
         self.motor_forward = Motor(self.port_forward, gears=CONSTANTS.GEARS_PLATFORM_FORWARD)
         self.motor_sideways = Motor(self.port_sideways, gears=CONSTANTS.GEARS_PLATFORM_SIDEWAYS)
@@ -69,10 +69,10 @@ class PlatformMotors:
 
         if speed > 0 and self.forward_get_angle() > CONSTANTS.MOTOR_FORWARD_MAX_DEGREE:
             speed = 0
-        elif speed < 0 and self.sideways_get_angle() < -CONSTANTS.MOTOR_FORWARD_MAX_DEGREE:
+        elif speed < 0 and self.forward_get_angle() < -CONSTANTS.MOTOR_FORWARD_MAX_DEGREE:
             speed = 0
 
-        self.motor_sideways.run(speed)
+        self.motor_forward.run(speed)
 
     def sideways_set_speed(self, speed, ramp_up_speed_to_min=False):
         if speed == 0.0:
@@ -87,9 +87,9 @@ class PlatformMotors:
             else:
                 raise MotorControlException("Motor speed is lower than minimum speed. This leads to motor wiggle. Set speed: " + str(speed))
 
-        if speed > 0 and self.sideways_get_angle() > CONSTANTS.MOTOR_FORWARD_MAX_DEGREE:
+        if speed > 0 and self.sideways_get_angle() > CONSTANTS.MOTOR_SIDEWAYS_MAX_DEGREE:
             speed = 0
-        elif speed < 0 and self.forward_get_angle() < -CONSTANTS.MOTOR_FORWARD_MAX_DEGREE:
+        elif speed < 0 and self.sideways_get_angle() < -CONSTANTS.MOTOR_SIDEWAYS_MAX_DEGREE:
             speed = 0
 
         self.motor_sideways.run(speed)

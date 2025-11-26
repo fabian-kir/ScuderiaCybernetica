@@ -78,6 +78,11 @@ class DriveMotor:
     def drive(self, speed):
         if speed == 0:
             self.motor.hold()
+            self.target_speed = 0
+            # Reset PID controller to prevent integral windup when stopping
+            self.pid_controller.reset()
+            self.set_power(0)
+            return
 
         if abs(speed) > CONSTANTS.DRIVE_MOTOR_MAX_SPEED:
             raise MotorControlException("Drive Motor speed is set to a speed higher than DRIVE_MOTOR_MAX_SPEED")
@@ -91,6 +96,11 @@ class DriveMotor:
         log_data("drive_motor_speed", self.motor.speed())
         log_data("drive_motor_power", self.get_power())
         log_data("target_speed", self.target_speed)
+
+        # Skip PID control when target speed is 0 to prevent oscillations from noise
+        if self.target_speed == 0:
+            self.set_power(0)
+            return
 
         # PID Control Speed:
         power = self.pid_controller(dt)

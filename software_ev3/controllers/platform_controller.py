@@ -29,6 +29,7 @@ class PlatformController:
 
     def sideways_proportional_speed_control(self, dt):
         error = self.color_sensor.get_reflection_error()
+
         self.platform_motors.sideways_set_speed(error * CONSTANTS.PLATFORM_SIDEWAYS_SPEED_KP,
                                                 ramp_up_speed_to_min=True)
 

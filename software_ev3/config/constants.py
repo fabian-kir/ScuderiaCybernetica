@@ -17,18 +17,16 @@ class CONSTANTS:
     GEARS_PLATFORM_SIDEWAYS = [[12, 20], [8, 40]]
 
     # Motors need to go at a minimum speed so that there's no wiggle
-    MIN_SPEED_PLATFORM_FORWARD = 25
-    MIN_SPEED_PLATFORM_SIDEWAYS = 25
+    MIN_SPEED_PLATFORM_FORWARD = 1
 
     # Proportional gain: angle correction per unit of reflection error
     # Higher values = faster response
-    PLATFORM_FORWARD_MAX_SPEED = 1000
-    PLATFORM_FORWARD_SPEED_KP = 50
+    PLATFORM_FORWARD_MAX_SPEED = 10
+    PLATFORM_FORWARD_SPEED_KP = 1
 
-    PLATFORM_SIDEWAYS_SPEED_KP = 50
-    PLATFORM_SIDEWAYS_MAX_SPEED = 1000
-
-    PLATFORM_SIDEWAYS_SPEED_KP = 50
+    PLATFORM_SIDEWAYS_SPEED_KP = -5
+    MIN_SPEED_PLATFORM_SIDEWAYS = 5
+    PLATFORM_SIDEWAYS_MAX_SPEED = 60
 
     MOTOR_FORWARD_MAX_DEGREE = 20 # max rotation from calibration-0
     MOTOR_SIDEWAYS_MAX_DEGREE = 20
