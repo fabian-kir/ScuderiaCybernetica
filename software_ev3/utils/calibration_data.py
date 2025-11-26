@@ -14,10 +14,8 @@ class CalibrationData:
             for row in csv.read_all():
                 if len(row) == 2:
                     key, val = row
-                    try:
-                        self.values[key] = eval(val)
-                    except Exception:
-                        print(f"Warning: Failed to parse value for {key}: {val}")
+                    self.values[key] = eval(val)
+
 
     def safe_to_file(self):
         with CSVFileHandler(self.path_to_file, mode='w') as csv:

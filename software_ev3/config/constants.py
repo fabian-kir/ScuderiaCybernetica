@@ -7,14 +7,14 @@ Constants are organized by subsystem for better maintainability.
 
 class CONSTANTS:
     CALIBRATE_ON_START = True # set this to false to use the stored calibration data of the last run
-    PATH_TO_CALIBRATION_DATA = "config/calibration_data_0deg.csv"
-    DRIVE_MOTOR_SLOPE_CALIBRATION_CSV_PATH  = "config/drive_motor_slope_calibration.csv"
+    PATH_TO_CALIBRATION_DATA = "software_ev3/config/calibration_data_0deg.csv"
+    DRIVE_MOTOR_SLOPE_CALIBRATION_CSV_PATH  = "software_ev3/config/drive_motor_slope_calibration.csv"
 
     TIME_UNTIL_PLATFORM_CONTROLLER_STARTS = 1 # in Seconds
 
     # Gear ratios for balance platform motors
-    GEAR_RATIO_PLATFORM_FORWARD = -7
-    GEAR_RATIO_PLATFORM_SIDEWAYS = 8.35
+    GEARS_PLATFORM_FORWARD = [24, 56]
+    GEARS_PLATFORM_SIDEWAYS = [[12, 20], [8, 40]]
 
     # Motors need to go at a minimum speed so that there's no wiggle
     MIN_SPEED_PLATFORM_FORWARD = 25
@@ -35,7 +35,7 @@ class CONSTANTS:
 
     # DRIVE MOTOR
 
-    GEAR_RATIO_DRIVE_MOTOR = 1
+    GEARS_DRIVE_MOTOR = [1, ]
     DRIVE_MOTOR_TARGET_SPEED = 300
     DRIVE_MOTOR_MAX_SPEED = 700 # in deg / s
 

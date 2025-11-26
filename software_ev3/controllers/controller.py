@@ -8,7 +8,6 @@ from software_ev3.hardware.robot_hub import RobotHub
 from software_ev3.hardware.drive_motor import DriveMotor
 from software_ev3.hardware.ultrasonic_sensor import UltrasonicSensor
 from software_ev3.hardware.color_sensor import ColorSensor
-from software_ev3.hardware.touch_sensors import TouchSensors
 
 from software_ev3.controllers.platform_controller import PlatformController
 
@@ -26,12 +25,11 @@ class Controller:
         self.drive_motor = DriveMotor()
         self.ultrasonic_sensor = UltrasonicSensor()
         self.color_sensor = ColorSensor()
-        self.touch_sensors = TouchSensors()
 
         # CONTROLLERS
         self.plattform_controller = PlatformController()
 
-        self.to_update = [self.hub, self.touch_sensors, self.plattform_motors, self.drive_motor, self.color_sensor, self.ultrasonic_sensor, self.plattform_controller]
+        self.to_update = [self.hub, self.plattform_motors, self.drive_motor, self.color_sensor, self.ultrasonic_sensor, self.plattform_controller]
         self.running = False
         self.load_calibrations()
 

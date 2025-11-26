@@ -26,8 +26,8 @@ class PlatformMotors:
         self.port_forward = PORTS["LARGE_BALANCE_MOTOR"]
         self.port_sideways = PORTS["SMALL_BALANCE_MOTOR"]
 
-        self.motor_forward = Motor(self.port_forward, gears=[CONSTANTS.GEAR_RATIO_PLATFORM_FORWARD, ])
-        self.motor_sideways = Motor(self.port_sideways, gears=[CONSTANTS.GEAR_RATIO_PLATFORM_SIDEWAYS, ])
+        self.motor_forward = Motor(self.port_forward, gears=CONSTANTS.GEARS_PLATFORM_FORWARD)
+        self.motor_sideways = Motor(self.port_sideways, gears=CONSTANTS.GEARS_PLATFORM_SIDEWAYS)
 
         self.motor_forward.reset_angle(0)
         self.motor_sideways.reset_angle(0)
@@ -54,16 +54,25 @@ class PlatformMotors:
 
         self.motor_sideways.track_target(angle * CONSTANTS.GEAR_RATIO_BALANCE_SIDEWAYS)
 
-    def forward_set_speed(self, speed):
+    def forward_set_speed(self, speed, ramp_up_speed_to_min=False):
+        if speed == 0.0:
+            self.motor_forward.hold()
+            return
+
         if abs(speed) < CONSTANTS.MIN_SPEED_PLATFORM_FORWARD:
-            raise MotorControlException("Motor speed is lower than minimum speed. This leads to motor wiggle. Set speed: " + speed)
+            if ramp_up_speed_to_min and speed > 0:
+                speed = CONSTANTS.MIN_SPEED_PLATFORM_FORWARD
+            elif ramp_up_speed_to_min and speed < 0:
+                speed = -CONSTANTS.MIN_SPEED_PLATFORM_FORWARD
+            else:
+                raise MotorControlException("Motor speed is lower than minimum speed. This leads to motor wiggle. Set speed: " + str(speed))
 
         if speed > 0 and self.forward_get_angle() > CONSTANTS.MOTOR_FORWARD_MAX_DEGREE:
             speed = 0
-        elif speed < 0 and self.forward_get_angle() < -CONSTANTS.MOTOR_FORWARD_MAX_DEGREE:
+        elif speed < 0 and self.sideways_get_angle() < -CONSTANTS.MOTOR_FORWARD_MAX_DEGREE:
             speed = 0
 
-        self.motor_forward.run(speed)
+        self.motor_sideways.run(speed)
 
     def sideways_set_speed(self, speed, ramp_up_speed_to_min=False):
         if speed == 0.0:
@@ -80,7 +89,7 @@ class PlatformMotors:
 
         if speed > 0 and self.sideways_get_angle() > CONSTANTS.MOTOR_FORWARD_MAX_DEGREE:
             speed = 0
-        elif speed < 0 and self.sideways_get_angle() < -CONSTANTS.MOTOR_FORWARD_MAX_DEGREE:
+        elif speed < 0 and self.forward_get_angle() < -CONSTANTS.MOTOR_FORWARD_MAX_DEGREE:
             speed = 0
 
         self.motor_sideways.run(speed)
@@ -95,8 +104,11 @@ class PlatformMotors:
         self.motor_sideways.hold()
     
     def forward_get_angle(self):
-        return self.motor_forward.angle() / CONSTANTS.GEAR_RATIO_PLATFORM_FORWARD
+        # return self.motor_forward.angle() / CONSTANTS.GEARS_RATIO_PLATFORM_FORWARD
+        # i think this should already be adjusted for gear ratio but who knows
+        return self.motor_forward.angle()
     
     def sideways_get_angle(self):
-        return self.motor_sideways.angle() / CONSTANTS.GEAR_RATIO_PLATFORM_SIDEWAYS
-        
+        # return self.motor_sideways.angle() / CONSTANTS.GEAR_RATIO_PLATFORM_SIDEWAYS
+                # i think this should already be adjusted for gear ratio but who knows
+        return self.motor_sideways.angle()

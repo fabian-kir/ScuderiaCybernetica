@@ -18,7 +18,7 @@ from software_ev3.utils.csv_file_handler import CSVFileHandler
 class DriveMotor:
     def __init__(self, run_slope_calibration=False):
         self.port = PORTS["DRIVE_MOTOR"]
-        self.motor = Motor(self.port, gears=[CONSTANTS.GEAR_RATIO_DRIVE_MOTOR])
+        self.motor = Motor(self.port, gears=CONSTANTS.GEARS_DRIVE_MOTOR)
         self.motor.reset_angle(0)
 
         self._calibration_lookup = {}
@@ -149,17 +149,8 @@ class DriveMotor:
         self.load_slope_calibration()
 
     def load_slope_calibration(self):
-        try:
-            with CSVFileHandler(CONSTANTS.DRIVE_MOTOR_SLOPE_CALIBRATION_CSV_PATH) as csv:
-                calibration_rows = csv.read_dict()
-        except FileNotFoundError:
-            RobotHub().print(
-                "Drive motor slope calibration file not found. "
-                "Run slope calibration to enable slope compensation."
-            )
-            self._calibration_lookup = {}
-            self._calibration_speeds = []
-            return
+        with CSVFileHandler(CONSTANTS.DRIVE_MOTOR_SLOPE_CALIBRATION_CSV_PATH, mode='r') as csv:
+            calibration_rows = csv.read_dict()
 
         if not calibration_rows:
             RobotHub().print("Drive motor slope calibration file is empty.")

@@ -1,7 +1,6 @@
 from software_ev3.hardware.robot_hub import RobotHub
 from software_ev3.hardware.color_sensor import ColorSensor
 from software_ev3.hardware.platform_motors import PlatformMotors
-from software_ev3.hardware.touch_sensors import TouchSensors
 from software_ev3.hardware.ultrasonic_sensor import UltrasonicSensor
 from software_ev3.config.constants import CONSTANTS
 from pybricks.tools import StopWatch, wait
@@ -17,7 +16,6 @@ class PlatformController:
         self.color_sensor = ColorSensor()
         self.drive_motor = DriveMotor()
         self.platform_motors = PlatformMotors()
-        self.touch_sensors = TouchSensors()
         self.ultrasonic_sensor = UltrasonicSensor()
 
         self.time_since_startup = 0
@@ -35,10 +33,11 @@ class PlatformController:
                                                 ramp_up_speed_to_min=True)
 
     def forward_proportional_speed_control(self, dt):
-        slope_soll = self.drive_motor.get_slope()
+        slope_soll = self.ultrasonic_sensor.get_distance_error()        
         slope_ist = self.platform_motors.forward_get_angle()
         error = slope_soll - slope_ist
-        self.platform_motors.forward_set_speed(error * CONSTANTS.PLATFORM_FORWARD_SPEED_KP)
+        self.platform_motors.forward_set_speed(error * CONSTANTS.PLATFORM_FORWARD_SPEED_KP,
+                                               ramp_up_speed_to_min=True)
 
     def controller_ready(self, dt):
         self.time_since_startup += dt
