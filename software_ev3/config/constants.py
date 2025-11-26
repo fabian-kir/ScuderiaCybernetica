@@ -10,7 +10,12 @@ class CONSTANTS:
     PATH_TO_CALIBRATION_DATA = "software_ev3/config/calibration_data_0deg.csv"
     DRIVE_MOTOR_SLOPE_CALIBRATION_CSV_PATH  = "software_ev3/config/drive_motor_slope_calibration.csv"
 
-    TIME_UNTIL_PLATFORM_CONTROLLER_STARTS = 1 # in Seconds
+    ULTRASONIC_PENDULUM_LENGTH = 155 # in mm
+    
+    # Data logging: set to False to disable all file logging (improves performance)
+    DATA_LOGGING_ENABLED = False
+
+    TIME_UNTIL_PLATFORM_CONTROLLER_STARTS = 0 # in Seconds
 
     # Gear ratios for balance platform motors
     GEARS_PLATFORM_FORWARD = [24, 56]
@@ -22,20 +27,20 @@ class CONSTANTS:
     # Proportional gain: angle correction per unit of reflection error
     # Higher values = faster response
     PLATFORM_FORWARD_MAX_SPEED = 80
-    PLATFORM_FORWARD_SPEED_KP = 8
+    PLATFORM_FORWARD_SPEED_KP = 1
 
     PLATFORM_SIDEWAYS_SPEED_KP = -5
     MIN_SPEED_PLATFORM_SIDEWAYS = 5
     PLATFORM_SIDEWAYS_MAX_SPEED = 60
 
-    MOTOR_FORWARD_MAX_DEGREE = 20 # max rotation from calibration-0
+    MOTOR_FORWARD_MAX_DEGREE = 80 # max rotation from calibration-0
     MOTOR_SIDEWAYS_MAX_DEGREE = 40
 
     # DRIVE MOTOR
 
     GEARS_DRIVE_MOTOR = [1, ]
     DRIVE_MOTOR_TARGET_SPEED = 300
-    DRIVE_MOTOR_MAX_SPEED = 700 # in deg / s
+    DRIVE_MOTOR_MAX_SPEED = 2000 # in deg / s
 
     DRIVE_MOTOR_MIN_POWER = .5 # in V
 

@@ -249,7 +249,7 @@ class DriveMotor:
 class DriveMotorAtConstantSpeed:
     def __init__(self):
         self.port = PORTS["DRIVE_MOTOR"]
-        self.motor = Motor(self.port, gears=[CONSTANTS.GEAR_RATIO_DRIVE_MOTOR])
+        self.motor = Motor(self.port, gears=CONSTANTS.GEARS_DRIVE_MOTOR)
         self.motor.reset_angle(0)
         self.target_speed = CONSTANTS.DRIVE_MOTOR_TARGET_SPEED
         self.drive(self.target_speed)

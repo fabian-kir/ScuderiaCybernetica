@@ -5,7 +5,7 @@ from software_ev3.utils.data_logger import log_data
 
 from software_ev3.hardware.platform_motors import PlatformMotors
 from software_ev3.hardware.robot_hub import RobotHub
-from software_ev3.hardware.drive_motor import DriveMotor
+from software_ev3.hardware.drive_motor import DriveMotor, DriveMotorAtConstantSpeed
 from software_ev3.hardware.ultrasonic_sensor import UltrasonicSensor
 from software_ev3.hardware.color_sensor import ColorSensor
 
@@ -22,7 +22,7 @@ class Controller:
         # HARDWARE WRAPPERS
         self.hub = RobotHub()
         self.plattform_motors = PlatformMotors()
-        self.drive_motor = DriveMotor()
+        self.drive_motor = DriveMotorAtConstantSpeed()
         self.ultrasonic_sensor = UltrasonicSensor()
         self.color_sensor = ColorSensor()
 
@@ -35,7 +35,6 @@ class Controller:
 
     def run(self):
         """Main control loop with delta timing using Pybricks StopWatch."""
-        
         # Values for testing
         self.drive_motor.drive(0)
 

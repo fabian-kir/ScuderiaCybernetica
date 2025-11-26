@@ -4,6 +4,7 @@ from software_ev3.hardware.platform_motors import PlatformMotors
 from software_ev3.hardware.ultrasonic_sensor import UltrasonicSensor
 from software_ev3.config.constants import CONSTANTS
 from pybricks.tools import StopWatch, wait
+import math
 
 from software_ev3.utils.data_logger import log_data
 
@@ -25,7 +26,7 @@ class PlatformController:
             return
 
         self.sideways_proportional_speed_control(dt)
-        self.forward_proportional_speed_control(dt)
+        self.forward_mathematical_speed_control(dt)
 
     def sideways_proportional_speed_control(self, dt):
         error = self.color_sensor.get_reflection_error()
@@ -36,6 +37,14 @@ class PlatformController:
     def forward_proportional_speed_control(self, dt):
         slope_soll = self.ultrasonic_sensor.get_distance_error()        
         slope_ist = self.platform_motors.forward_get_angle()
+        error = slope_soll - slope_ist
+        self.platform_motors.forward_set_speed(error * CONSTANTS.PLATFORM_FORWARD_SPEED_KP,
+                                               ramp_up_speed_to_min=True)
+        
+    def forward_mathematical_speed_control(self, dt):
+        slope_soll = 360 * (math.asin(min(max(self.ultrasonic_sensor.get_distance_error() / CONSTANTS.ULTRASONIC_PENDULUM_LENGTH, -1), 1)) / 2*math.pi)
+        slope_ist = self.platform_motors.forward_get_angle()
+
         error = slope_soll - slope_ist
         self.platform_motors.forward_set_speed(error * CONSTANTS.PLATFORM_FORWARD_SPEED_KP,
                                                ramp_up_speed_to_min=True)
