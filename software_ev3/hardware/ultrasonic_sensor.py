@@ -37,7 +37,8 @@ class UltrasonicSensor:
         RobotHub().print("Calibrated ultrasonic sensor to current state.")
 
     def update(self, dt):
-        log_data("ultrasonic_sensor_distance_error", self.get_distance_error())
+        return
+        #log_data("ultrasonic_sensor_distance_error", self.get_distance_error())
 
     def get_distance_error(self):
         """Returns the difference between the current distance and the target."""

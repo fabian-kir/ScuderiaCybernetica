@@ -16,7 +16,8 @@ class ColorSensor:
         RobotHub().print("Set up color sensor on port:", self.port)
 
     def update(self, dt):
-        log_data("color_sensor", self.get_reflection_error())
+        return
+        #log_data("color_sensor", self.get_reflection_error())
 
     def get_reflection_error(self, smoothed_for_iterations=5):
         """

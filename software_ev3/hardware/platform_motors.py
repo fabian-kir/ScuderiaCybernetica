@@ -35,8 +35,9 @@ class PlatformMotors:
         RobotHub().print("Set up balance motors x and y on ports:", self.port_forward, self.port_sideways)
 
     def update(self, dt):
-        log_data("balance_motor_x", self.motor_forward.angle())
-        log_data("balance_motor_y", self.motor_sideways.angle())
+        return
+        #log_data("balance_motor_x", self.motor_forward.angle())
+        #log_data("balance_motor_y", self.motor_sideways.angle())
 
     def forward_track_target(self, angle):
         if angle > CONSTANTS.MOTOR_FORWARD_MAX_DEGREE:
@@ -112,3 +113,9 @@ class PlatformMotors:
         # return self.motor_sideways.angle() / CONSTANTS.GEAR_RATIO_PLATFORM_SIDEWAYS
                 # i think this should already be adjusted for gear ratio but who knows
         return self.motor_sideways.angle()
+    
+    def run_sideways(self, speed):
+        self.motor_sideways.run(speed)
+
+    def run_forward(self, speed):
+        self.motor_forward.run(speed)

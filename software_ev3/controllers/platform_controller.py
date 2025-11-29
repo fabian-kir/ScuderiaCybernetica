@@ -21,18 +21,40 @@ class PlatformController:
 
         self.time_since_startup = 0
 
+        self.sideways_last_error = 0
+        self.sideways_integral = 0
+
+        self.angle_smooth = self.platform_motors.forward_get_angle()
+        self.alpha = 0.2
+
     def update(self, dt):
         if not self.controller_ready(dt):
             return
 
-        self.sideways_proportional_speed_control(dt)
+        self.sideways_proportional_speed_control(dt , 4, 10, 0)
         self.forward_mathematical_speed_control(dt)
 
-    def sideways_proportional_speed_control(self, dt):
-        error = self.color_sensor.get_reflection_error()
+    def sideways_proportional_speed_control(self, dt, kp, ki, kd):
+ 
+        y_error = 63 - self.color_sensor.get_reflection()
+    
+        if dt != 0:
+            derivative = (y_error - self.sideways_last_error) / dt
+        else : 
+            derivative = 0   
+        
+        self.sideways_last_error = y_error
 
-        self.platform_motors.sideways_set_speed(error * CONSTANTS.PLATFORM_SIDEWAYS_SPEED_KP,
-                                                ramp_up_speed_to_min=True)
+        self.sideways_integral = self.sideways_integral * 0.95 + y_error * dt
+
+        power = (-1) * (y_error * (kp) + derivative * kd + self.sideways_integral * ki)
+        if self.platform_motors.sideways_get_angle() > 70 and y_error < 0:
+            power = 0
+        if self.platform_motors.sideways_get_angle() < -70 and y_error > 0:
+            power = 0
+
+    
+        self.platform_motors.run_sideways(power)
 
     def forward_proportional_speed_control(self, dt):
         slope_soll = self.ultrasonic_sensor.get_distance_error()        
@@ -42,12 +64,21 @@ class PlatformController:
                                                ramp_up_speed_to_min=True)
         
     def forward_mathematical_speed_control(self, dt):
-        slope_soll = 360 * (math.asin(min(max(self.ultrasonic_sensor.get_distance_error() / CONSTANTS.ULTRASONIC_PENDULUM_LENGTH, -1), 1)) / 2*math.pi)
-        slope_ist = self.platform_motors.forward_get_angle()
+        #calculatiung the angle 
+        x = self.ultrasonic_sensor.get_distance()
+        angle_desired = 0.0009 * x**2 - 0.5774 *x + 52.877
 
-        error = slope_soll - slope_ist
-        self.platform_motors.forward_set_speed(error * CONSTANTS.PLATFORM_FORWARD_SPEED_KP,
-                                               ramp_up_speed_to_min=True)
+        
+        self.angle_smooth = self.angle_smooth + self.alpha * (angle_desired - self.angle_smooth)
+
+        if self.angle_smooth < -20:
+            target = -20
+        elif self.angle_smooth > 20:
+            target = 20
+        else :
+            target = self.angle_smooth
+    
+        self.platform_motors.forward_track_target( target * 8.35)
 
     def controller_ready(self, dt):
         self.time_since_startup += dt
