@@ -19,7 +19,9 @@ class CONSTANTS:
 
     # Gear ratios for balance platform motors
     GEARS_PLATFORM_FORWARD = [24, 56]
+    GEAR_RATIO_BALANCE_FORWARD = 24 / 56
     GEARS_PLATFORM_SIDEWAYS = [[12, 20], [8, 40]]
+    GEAR_RATIO_BALANCE_SIDEWAYS = (12/20) * (8 / 40)
 
     # Motors need to go at a minimum speed so that there's no wiggle
     MIN_SPEED_PLATFORM_FORWARD = 2
