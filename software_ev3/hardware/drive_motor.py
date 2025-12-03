@@ -93,9 +93,9 @@ class DriveMotor:
         self.pid_controller.set_target(speed)
 
     def update(self, dt):
-        #log_data("drive_motor_speed", self.motor.speed())
-        #log_data("drive_motor_power", self.get_power())
-        #log_data("target_speed", self.target_speed)
+        log_data("drive_motor_speed", self.motor.speed())
+        log_data("drive_motor_power", self.get_power())
+        log_data("target_speed", self.target_speed)
 
         # Skip PID control when target speed is 0 to prevent oscillations from noise
         if self.target_speed == 0:

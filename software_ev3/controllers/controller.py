@@ -53,7 +53,7 @@ class Controller:
                 dt = .001
 
             self.update(dt)
-            #log_data("dt", dt)
+            log_data("dt", dt)
 
 
     def load_calibrations(self):

@@ -31,15 +31,15 @@ class PlatformController:
         if not self.controller_ready(dt):
             return
 
-        self.sideways_proportional_speed_control(dt , 4, 10, 0)
+        self.sideways_proportional_speed_control(dt , 0.7, 0.002, 10)
         self.forward_mathematical_speed_control(dt)
 
     def sideways_proportional_speed_control(self, dt, kp, ki, kd):
  
         y_error = 63 - self.color_sensor.get_reflection()
-    
+        dt = dt * 1000
         if dt != 0:
-            derivative = (y_error - self.sideways_last_error) / dt
+            derivative = (y_error - self.sideways_last_error) / dt 
         else : 
             derivative = 0   
         
@@ -48,10 +48,11 @@ class PlatformController:
         self.sideways_integral = self.sideways_integral * 0.95 + y_error * dt
 
         power = (-1) * (y_error * (kp) + derivative * kd + self.sideways_integral * ki)
-        if self.platform_motors.sideways_get_angle() > 70 and y_error < 0:
+        if self.platform_motors.sideways_get_angle() > 10 and y_error < 0:
             power = 0
-        if self.platform_motors.sideways_get_angle() < -70 and y_error > 0:
+        if self.platform_motors.sideways_get_angle() < -10 and y_error > 0:
             power = 0
+        print(dt ,y_error, self.sideways_integral, derivative )
 
     
         self.platform_motors.run_sideways(power)
@@ -71,14 +72,14 @@ class PlatformController:
         
         self.angle_smooth = self.angle_smooth + self.alpha * (angle_desired - self.angle_smooth)
 
-        if self.angle_smooth < -20:
+        if self.angle_smooth < -20 * 8.35:
             target = -20
-        elif self.angle_smooth > 20:
+        elif self.angle_smooth > 20 * 8.35:
             target = 20
         else :
             target = self.angle_smooth
     
-        self.platform_motors.forward_track_target( target * 8.35)
+        self.platform_motors.forward_track_target( target *8.35)
 
     def controller_ready(self, dt):
         self.time_since_startup += dt

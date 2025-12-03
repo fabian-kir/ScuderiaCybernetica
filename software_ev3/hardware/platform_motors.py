@@ -35,9 +35,9 @@ class PlatformMotors:
         RobotHub().print("Set up balance motors x and y on ports:", self.port_forward, self.port_sideways)
 
     def update(self, dt):
-        return
-        #log_data("balance_motor_x", self.motor_forward.angle())
-        #log_data("balance_motor_y", self.motor_sideways.angle())
+        
+        log_data("balance_motor_x", self.motor_forward.angle())
+        log_data("balance_motor_y", self.motor_sideways.angle())
 
     def forward_track_target(self, angle):
         if angle > CONSTANTS.MOTOR_FORWARD_MAX_DEGREE:
