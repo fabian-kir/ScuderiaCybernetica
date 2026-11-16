@@ -1,0 +1,8 @@
+.DS_Store
+.idea/
+__pycache__/
+*.pyc
+.venv/
+venv/
+# log output of software_ev3/utils/data_logger.py
+robot_data.csv
