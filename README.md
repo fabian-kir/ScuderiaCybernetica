@@ -1,8 +1,13 @@
 # Scuderia Cybernetica
 
-Control software for a LEGO Mindstorms EV3 robot that drives on its own and keeps a platform on top
-of it level in two axes. Written in Python for [Pybricks](https://pybricks.com/ev3-micropython/)
-MicroPython as a team project.
+Our team's entry for **ROBORACE 2025**, the annual robotics competition of the Institute for Systems
+Theory and Automatic Control (IST) at the University of Stuttgart. **We finished in third place.**
+
+In ROBORACE, teams of school and university students build an autonomous LEGO robot for a new
+control engineering task each year. In 2025, the 25th edition, the robot had to carry a load on a
+transport platform. This repository is the control software for our LEGO Mindstorms EV3 robot: it
+drives on its own and keeps the platform on top of it level in two axes. It is written in Python
+for [Pybricks](https://pybricks.com/ev3-micropython/) MicroPython.
 
 The repository also contains a desktop emulator of the EV3, so the same control code can be run and
 debugged in a browser without the brick.
@@ -79,4 +84,6 @@ python3 data_plotter/plot_data.py robot_data.csv
 
 ## Team
 
-Built by a team of students; see the commit history for the contributors.
+Team Scuderia Cybernetica, ROBORACE 2025. See the commit history for the contributors.
+
+More about the competition: [ROBORACE at the IST](https://www.ist.uni-stuttgart.de/teaching/roborace_ist/)
